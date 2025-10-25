@@ -32,6 +32,7 @@ class ModernBERTStreamingDataset(IterableDataset):
         skip: int = 0,
         limit: int = None,
         prefiltered: bool = False,
+        simplify_labels: bool = False,
     ):
         """
         Initialize streaming dataset.
@@ -43,6 +44,7 @@ class ModernBERTStreamingDataset(IterableDataset):
             skip: Number of stories to skip
             limit: Max stories to process
             prefiltered: If True, assumes data is pre-processed with tokens/bio_tags
+            simplify_labels: If True, collapse role labels to B-PERSON/I-PERSON
         """
         self.jsonl_path = jsonl_path
         self.tokenizer = tokenizer
@@ -50,21 +52,47 @@ class ModernBERTStreamingDataset(IterableDataset):
         self.skip = skip
         self.limit = limit
         self.prefiltered = prefiltered
+        self.simplify_labels = simplify_labels
 
         # Initialize preprocessor if not prefiltered
         if not prefiltered:
             self.preprocessor = StoryPreprocessor(use_spacy=False)
 
         # Label mappings
-        self.label_to_id = {
-            'O': 0,
-            'B-ANTAGONIST': 1,
-            'B-PROTAGONIST': 2,
-            'B-SUPPORTING': 3,
-            'I-ANTAGONIST': 4,
-            'I-PROTAGONIST': 5,
-            'I-SUPPORTING': 6,
-        }
+        if simplify_labels:
+            # Simplified B/I/O for entity detection only
+            self.label_to_id = {
+                'O': 0,
+                'B-PERSON': 1,
+                'I-PERSON': 2,
+                'B-LOCATION': 3,
+                'I-LOCATION': 4,
+            }
+            # Map role labels to simplified labels
+            self.role_to_simple = {
+                'B-PROTAGONIST': 'B-PERSON',
+                'I-PROTAGONIST': 'I-PERSON',
+                'B-ANTAGONIST': 'B-PERSON',
+                'I-ANTAGONIST': 'I-PERSON',
+                'B-SUPPORTING': 'B-PERSON',
+                'I-SUPPORTING': 'I-PERSON',
+                'B-LOCATION': 'B-LOCATION',
+                'I-LOCATION': 'I-LOCATION',
+                'O': 'O',
+            }
+        else:
+            # Full role-aware labels
+            self.label_to_id = {
+                'O': 0,
+                'B-ANTAGONIST': 1,
+                'B-PROTAGONIST': 2,
+                'B-SUPPORTING': 3,
+                'I-ANTAGONIST': 4,
+                'I-PROTAGONIST': 5,
+                'I-SUPPORTING': 6,
+            }
+            self.role_to_simple = None
+
         self.id_to_label = {v: k for k, v in self.label_to_id.items()}
 
     def __iter__(self) -> Iterator[Dict[str, Any]]:
@@ -146,6 +174,9 @@ class ModernBERTStreamingDataset(IterableDataset):
                 labels.append(-100)
             elif word_idx != previous_word_idx:
                 tag = bio_tags[word_idx]
+                # Apply simplification if enabled
+                if self.simplify_labels and self.role_to_simple:
+                    tag = self.role_to_simple.get(tag, tag)
                 labels.append(self.label_to_id.get(tag, 0))
             else:
                 labels.append(-100)
@@ -214,6 +245,7 @@ def main():
     parser.add_argument('--input', default="ner_training_filtered_8k.jsonl", help="Input JSONL file")
     parser.add_argument('--output', default="./story_ner_model_modernbert", help="Output directory")
     parser.add_argument('--max-length', type=int, default=8192, help="Max token length")
+    parser.add_argument('--simplify-labels', action='store_true', help="Collapse role labels to B/I-PERSON")
     args = parser.parse_args()
 
     print("🚀 TRAINING RUNE NER WITH MODERNBERT")
@@ -221,6 +253,10 @@ def main():
     print("🤖 Model: ModernBERT-base (8192 token context)")
     print("💾 Memory-efficient streaming")
     print("📊 Dataset: Synthetic stories with ground truth")
+    if args.simplify_labels:
+        print("🔄 Mode: Simplified B/I-PERSON labels (role-agnostic)")
+    else:
+        print("🎭 Mode: Full role-aware labels (B-PROTAGONIST, etc.)")
     print(f"📁 Input: {args.input}")
     print(f"💾 Output: {args.output}")
     print("=" * 70)
@@ -255,15 +291,25 @@ def main():
     print(f"🔄 Loading ModernBERT...")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    label_to_id = {
-        'O': 0,
-        'B-ANTAGONIST': 1,
-        'B-PROTAGONIST': 2,
-        'B-SUPPORTING': 3,
-        'I-ANTAGONIST': 4,
-        'I-PROTAGONIST': 5,
-        'I-SUPPORTING': 6,
-    }
+    # Configure labels based on simplify_labels flag
+    if args.simplify_labels:
+        label_to_id = {
+            'O': 0,
+            'B-PERSON': 1,
+            'I-PERSON': 2,
+            'B-LOCATION': 3,
+            'I-LOCATION': 4,
+        }
+    else:
+        label_to_id = {
+            'O': 0,
+            'B-ANTAGONIST': 1,
+            'B-PROTAGONIST': 2,
+            'B-SUPPORTING': 3,
+            'I-ANTAGONIST': 4,
+            'I-PROTAGONIST': 5,
+            'I-SUPPORTING': 6,
+        }
     id_to_label = {v: k for k, v in label_to_id.items()}
 
     model = AutoModelForTokenClassification.from_pretrained(
@@ -273,6 +319,7 @@ def main():
         label2id=label_to_id,
     )
     print(f"✅ ModernBERT loaded with {len(label_to_id)} labels")
+    print(f"   Labels: {', '.join(label_to_id.keys())}")
     print(f"   Max position embeddings: {model.config.max_position_embeddings}")
     print()
 
@@ -284,7 +331,8 @@ def main():
         max_length=max_length,
         skip=0,
         limit=train_count,
-        prefiltered=True  # Data is already pre-processed
+        prefiltered=True,  # Data is already pre-processed
+        simplify_labels=args.simplify_labels
     )
 
     val_dataset = ModernBERTStreamingDataset(
@@ -293,7 +341,8 @@ def main():
         max_length=max_length,
         skip=val_split_idx,
         limit=val_count,
-        prefiltered=True  # Data is already pre-processed
+        prefiltered=True,  # Data is already pre-processed
+        simplify_labels=args.simplify_labels
     )
     print("✅ Streaming datasets created (using pre-filtered data)")
     print()
