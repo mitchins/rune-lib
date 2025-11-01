@@ -1,5 +1,5 @@
-"""Utility functions for Rune NER library."""
+"""Utility functions for the rune library."""
 
-from .metrics import evaluate_ner, compute_entity_metrics
+from .entity_normalization import normalize_entity
 
-__all__ = ["evaluate_ner", "compute_entity_metrics"]
+__all__ = ["normalize_entity"]

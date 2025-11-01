@@ -8,6 +8,7 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 from .schema import BioTag, BioSequence, TagSchema
 from .normalization import EntityNormalizer, NormalizedEntity
 from .coreference import CoreferenceHook, CoreferenceCluster
+from ..data.improved_tokenizer import ImprovedTokenizer
 
 
 class BioTagger:
@@ -50,6 +51,9 @@ class BioTagger:
         # Optional components
         self.normalizer = EntityNormalizer() if enable_normalization else None
         self.coreference_hook = CoreferenceHook() if enable_coreference else None
+
+        # Word tokenizer for text.split() operations
+        self.word_tokenizer = ImprovedTokenizer()
 
     def tag_tokens(self, tokens: List[str]) -> BioSequence:
         """
@@ -111,8 +115,8 @@ class BioTagger:
         Returns:
             BioSequence with predicted tags
         """
-        # Simple whitespace tokenization
-        tokens = text.split()
+        # Use ImprovedTokenizer for consistent punctuation handling
+        tokens = self.word_tokenizer.split_words(text)
         return self.tag_tokens(tokens)
 
     def extract_entities(self, bio_sequence: BioSequence) -> List[Dict[str, Any]]:

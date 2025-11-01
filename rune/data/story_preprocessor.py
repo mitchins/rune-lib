@@ -59,13 +59,29 @@ class StoryPreprocessor:
         Process a single story into training format.
 
         Args:
-            story_data: Raw story with 'text', 'characters', etc.
+            story_data: Raw story with 'text', 'entities'/'characters', etc.
 
         Returns:
             Processed story with tokens and bio_tags
         """
         text = story_data["text"]
-        characters = story_data.get("characters", [])
+
+        # STANDARD FORMAT: entities field (type=PERSON for characters)
+        # Legacy fallback: characters field (deprecated)
+        characters = []
+
+        if "entities" in story_data:
+            # Standard format - filter to PERSON entities only
+            entities = story_data["entities"]
+            for ent in entities:
+                if ent.get("type") == "PERSON":
+                    characters.append({
+                        "name": ent.get("text", ent.get("name", "")),
+                        "role": ent.get("role", "supporting")
+                    })
+        elif "characters" in story_data:
+            # Legacy format (deprecated)
+            characters = story_data.get("characters", [])
 
         # Create character name mappings with expanded variants
         char_to_role = {}
@@ -202,51 +218,85 @@ class StoryPreprocessor:
 
     def _generate_bio_tags(self, tokens: List[str], char_to_role: Dict[str, str]) -> List[str]:
         """
-        Generate BIO tags for tokens based on character mappings.
-
-        Args:
-            tokens: List of tokens
-            char_to_role: Mapping from character names to roles
-
-        Returns:
-            List of BIO tags
+        Generate BIO tags with smarter contextual gating:
+          - Titles (Mr., Dr., etc.) are kept as O but provide context for next token
+          - Surnames are only labeled if preceded by a title or part of a known multi-word name
+          - Prevents false positives like "the lamp" or "the cook"
         """
-        bio_tags = ["O"] * len(tokens)
+        TITLE_TOKENS = {
+            "mr", "mrs", "ms", "miss", "sir", "lady", "lord", "dr", "professor",
+            "captain", "major", "colonel", "commander", "emperor", "duke", "queen", "king"
+        }
 
-        # Find character mentions
+        COMMON_NOUNS = {
+            "lamp", "cook", "light", "shadow", "hope", "grace", "storm", "song", "flame",
+            "river", "stone", "oak", "rose"
+        }
+
+        tags = ["O"] * len(tokens)
+        lowered = [t.lower().strip(".,!?;:") for t in tokens]
+
         i = 0
         while i < len(tokens):
-            # Try multi-word character names first
-            found_match = False
+            tok = lowered[i]
 
-            # Try matching up to 3 consecutive tokens (for names like "Harry Potter")
-            for j in range(min(3, len(tokens) - i), 0, -1):
-                candidate = " ".join(tokens[i:i+j])
-
-                # Check exact match
-                if candidate in char_to_role:
-                    role = char_to_role[candidate]
-                    bio_tags[i] = f"B-{role}"
-                    for k in range(1, j):
-                        bio_tags[i + k] = f"I-{role}"
-                    i += j
-                    found_match = True
-                    break
-
-                # Check case-insensitive match
-                elif candidate.lower() in char_to_role:
-                    role = char_to_role[candidate.lower()]
-                    bio_tags[i] = f"B-{role}"
-                    for k in range(1, j):
-                        bio_tags[i + k] = f"I-{role}"
-                    i += j
-                    found_match = True
-                    break
-
-            if not found_match:
+            # (1) Skip title tokens entirely — context only
+            if tok in TITLE_TOKENS:
                 i += 1
+                continue
 
-        return bio_tags
+            # (2) Look ahead and behind for context
+            # Find previous non-empty token (skip punctuation)
+            prev_tok = ""
+            for k in range(i - 1, max(-1, i - 4), -1):
+                if k >= 0 and lowered[k]:  # Non-empty
+                    prev_tok = lowered[k]
+                    break
+
+            next_tok = lowered[i + 1] if i < len(tokens) - 1 else ""
+
+            # (3) Check for multi-token entity matches (3-, 2-, or 1-gram)
+            matched_role = None
+            window = 1
+            for w in (3, 2, 1):
+                if i + w <= len(tokens):
+                    span = " ".join(lowered[i:i + w])
+                    if span in char_to_role:
+                        matched_role = char_to_role[span]
+                        window = w
+                        break
+
+            if not matched_role:
+                i += 1
+                continue
+
+            # (5) Contextual gating for single surnames
+            # Allow only if preceded by title or part of known multi-word variant
+            if window == 1:
+                skip_token = False
+
+                if tok in COMMON_NOUNS:
+                    # Ambiguous word, skip if not capitalized mid-sentence
+                    if tokens[i][0].islower():
+                        skip_token = True
+
+                if not skip_token and prev_tok not in TITLE_TOKENS and f"{prev_tok} {tok}" not in char_to_role:
+                    # Standalone surname without cue → skip
+                    skip_token = True
+
+                if skip_token:
+                    i += 1
+                    continue
+
+            # (6) Apply BIO tags
+            tags[i] = f"B-{matched_role}"
+            for j in range(1, window):
+                if i + j < len(tokens):
+                    tags[i + j] = f"I-{matched_role}"
+
+            i += window
+
+        return tags
 
     def _extract_entities(self, tokens: List[str], bio_tags: List[str]) -> List[Dict[str, Any]]:
         """Extract entity information from tokens and tags."""
