@@ -111,9 +111,10 @@ class StoryPreprocessor:
             canonical_first = name_parts[0] if name_parts else ""
             for variant in variants:
                 variant_parts = variant.split()
-                # Surname-only if: single token AND not the first word of canonical name AND not a title
+                # Surname-only if: single token AND (not the first word of a multi-token name OR the name is single-token itself)
+                # Conservative: single-token names are treated as potentially surnames and require gating
                 if (len(variant_parts) == 1 and 
-                    variant.lower() != canonical_first.lower() and
+                    (len(name_parts) == 1 or variant.lower() != canonical_first.lower()) and
                     variant.lower().rstrip('.') not in TITLE_TOKENS):
                     surname_only_variants.add(variant.lower())
 
@@ -253,16 +254,23 @@ class StoryPreprocessor:
         return tokens
 
     def _check_surname_licensing(self, tokens: List[str], lowered: List[str], 
-                                 idx: int, spacy_doc, ARTICLES: set) -> bool:
+                                 idx: int, text: str, spacy_doc_ref: list, ARTICLES: set) -> bool:
         """
         Check if a surname at position idx has syntactic licensing to be tagged.
         
         Uses spaCy syntax analysis (REQUIRED - fails if spaCy unavailable).
+        Lazily initializes spaCy parsing on first call.
+        
+        Args:
+            spacy_doc_ref: list containing [spacy_doc] or [] for lazy init
         
         Returns True if licensed (should tag), False otherwise.
         """
-        if spacy_doc is None:
-            raise RuntimeError("spaCy is required for surname licensing. Install: pip install spacy && python -m spacy download en_core_web_sm")
+        # Lazy initialization: parse only when first needed
+        if not spacy_doc_ref:
+            spacy_doc_ref.append(self.nlp(text))
+        
+        spacy_doc = spacy_doc_ref[0]
         
         # Find the spaCy token that matches our token at idx
         # Use text matching since tokenization might differ
@@ -270,13 +278,16 @@ class StoryPreprocessor:
         spacy_token = None
         
         # Search for matching token in spaCy doc
+        # When multiple identical tokens exist, find the closest one
+        candidates = []
         for st in spacy_doc:
             if st.text == token_text or st.text.lower() == token_text.lower():
-                # Additional check: position should be roughly aligned
-                # (allow some drift but not huge gaps)
-                if abs(st.i - idx) < 5:
-                    spacy_token = st
-                    break
+                candidates.append((abs(st.i - idx), st))
+        
+        if candidates:
+            # Pick the closest match
+            candidates.sort(key=lambda x: x[0])
+            spacy_token = candidates[0][1]
         
         if spacy_token is None:
             # Token not found in spaCy doc - likely tokenization mismatch
@@ -354,19 +365,21 @@ class StoryPreprocessor:
           - Always match LONGEST name variant first (greedy matching)
           - Single-token names require capitalization OR title context
           - Surname-only variants require syntactic licensing (verb anchor, possessive, etc.)
-          - Uses spaCy POS/dependency parsing when available for accurate syntax
+          - Uses spaCy POS/dependency parsing (lazy-initialized) ONLY when surname gating is needed
         """
         if surname_only_variants is None:
             surname_only_variants = set()
             
         ARTICLES = {"the", "a", "an"}  # Lowercase article set
         
-        # Parse with spaCy for syntactic analysis (REQUIRED for surname gating)
-        # Reconstruct text from tokens for spaCy parsing
+        # Lazy initialization: spaCy will be parsed only when actually needed
         text = " ".join(tokens)
-        spacy_doc = self.nlp(text)
+        spacy_doc = None
         
         # Use module-level TITLE_TOKENS
+        
+        # Lazy-initialized spaCy doc (container to hold reference)
+        spacy_doc_ref = []
 
         tags = ["O"] * len(tokens)
         lowered = [t.lower().strip(".,!?;:'\"") for t in tokens]
@@ -437,9 +450,9 @@ class StoryPreprocessor:
                     if has_title_context:
                         pass  # Allow - title-licensed surname
                     else:
-                        # Check syntactic licensing using spaCy or fallback patterns
+                        # Check syntactic licensing using spaCy (lazy-initialized)
                         is_licensed = self._check_surname_licensing(
-                            tokens, lowered, i, spacy_doc, ARTICLES
+                            tokens, lowered, i, text, spacy_doc_ref, ARTICLES
                         )
                         
                         if not is_licensed:
@@ -450,7 +463,13 @@ class StoryPreprocessor:
                 # Additional check: Block names that are objects of naming/calling verbs
                 # E.g., "named Norton", "called John" - these are weak introductory mentions
                 # Use spaCy to detect oprd/attr dependencies after naming verbs
-                if spacy_doc and window == 1:  # Only for single-token matches
+                if window == 1:  # Only for single-token matches
+                    # Lazy-initialize spaCy if needed
+                    if not spacy_doc_ref:
+                        spacy_doc_ref.append(self.nlp(text))
+                    
+                    spacy_doc = spacy_doc_ref[0]
+                    
                     # Find this token in spaCy doc - use original token text, not lowered
                     # Search near the same position, but be more precise
                     original_tok = tokens[i]
