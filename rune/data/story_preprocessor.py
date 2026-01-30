@@ -42,8 +42,8 @@ class StoryPreprocessor:
         Initialize story preprocessor.
 
         Args:
-            tokenizer: Optional tokenizer for alignment (if None, uses whitespace)
-            spacy_model: spaCy model to use (REQUIRED)
+            tokenizer: Optional tokenizer for alignment (if None, uses lightweight spaCy blank)
+            spacy_model: spaCy model for dependency parsing (REQUIRED for surname licensing)
         """
         self.tokenizer = tokenizer
 
@@ -57,14 +57,32 @@ class StoryPreprocessor:
                 "Install with: pip install spacy && python -m spacy download en_core_web_sm"
             )
         
+        # Load lightweight blank tokenizer (no components, just tokenization)
+        # This handles edge cases properly without loading heavy models
         try:
-            self.nlp = spacy.load(spacy_model)
-            self.use_spacy = True
-        except OSError:
+            self.nlp_blank = spacy.blank("en")
+        except Exception:
             raise RuntimeError(
-                f"spaCy model '{spacy_model}' not found.\n"
-                f"Install with: python -m spacy download {spacy_model}"
+                "Failed to create spaCy blank tokenizer.\n"
+                "Install with: pip install spacy"
             )
+        
+        # Load full model LAZILY for dependency parsing (surname licensing)
+        # Only initialized when actually needed
+        self.nlp = None
+        self.spacy_model_name = spacy_model
+        self.use_spacy = True
+    
+    def _load_full_model(self):
+        """Lazily load full spaCy model for dependency analysis."""
+        if self.nlp is None:
+            try:
+                self.nlp = spacy.load(self.spacy_model_name)
+            except OSError:
+                raise RuntimeError(
+                    f"spaCy model '{self.spacy_model_name}' not found.\n"
+                    f"Install with: python -m spacy download {self.spacy_model_name}"
+                )
 
     def process_story(self, story_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -256,8 +274,9 @@ class StoryPreprocessor:
         return normalized
 
     def _tokenize_with_spacy(self, text: str) -> List[str]:
-        """Tokenize text using spaCy."""
-        doc = self.nlp(text)
+        """Tokenize text using lightweight spaCy blank tokenizer (handles edge cases)."""
+        # Use blank tokenizer - no heavy model components, just tokenization
+        doc = self.nlp_blank(text)
         return [token.text for token in doc]
 
     def _tokenize_simple(self, text: str) -> List[str]:
@@ -292,8 +311,9 @@ class StoryPreprocessor:
         
         Returns True if licensed (should tag), False otherwise.
         """
-        # Lazy initialization: parse only when first needed
+        # Lazy initialization: load full model only when first needed
         if not spacy_doc_ref:
+            self._load_full_model()
             spacy_doc_ref.append(self.nlp(text))
         
         spacy_doc = spacy_doc_ref[0]
@@ -499,6 +519,7 @@ class StoryPreprocessor:
                 if window == 1:  # Only for single-token matches
                     # Lazy-initialize spaCy if needed
                     if not spacy_doc_ref:
+                        self._load_full_model()
                         spacy_doc_ref.append(self.nlp(text))
                     
                     spacy_doc = spacy_doc_ref[0]
