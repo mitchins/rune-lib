@@ -361,7 +361,7 @@ class StoryPreprocessor:
             
         ARTICLES = {"the", "a", "an"}  # Lowercase article set
         
-        # Parse with spaCy for syntactic analysis (REQUIRED)
+        # Parse with spaCy for syntactic analysis (REQUIRED for surname gating)
         # Reconstruct text from tokens for spaCy parsing
         text = " ".join(tokens)
         spacy_doc = self.nlp(text)
