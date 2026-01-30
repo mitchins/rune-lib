@@ -27,12 +27,14 @@ def run_scene_splitting(
     input_path: str,
     output_path: str,
     min_tokens: int = 100,
-    max_tokens: int = 4096
+    max_tokens: int = 4096,
+    batch_size: int = 100,
+    n_process: int = 12
 ) -> bool:
     """
     Step 1: Split stories over max_tokens into scenes.
 
-    Uses existing split_scenes.py utility.
+    Uses existing split_scenes.py utility with batching.
     """
     print(f"\n{'='*80}")
     print("STEP 1: SCENE SPLITTING")
@@ -40,6 +42,8 @@ def run_scene_splitting(
     print(f"Input: {input_path}")
     print(f"Token limit: {max_tokens}")
     print(f"Min tokens: {min_tokens}")
+    print(f"Batch size: {batch_size}")
+    print(f"Parallel processes: {n_process}")
 
     # Check if split_scenes.py exists
     split_script = Path(__file__).parent / "split_scenes.py"
@@ -54,6 +58,8 @@ def run_scene_splitting(
         '--output', output_path,
         '--min-tokens', str(min_tokens),
         '--max-tokens', str(max_tokens),
+        '--batch-size', str(batch_size),
+        '--n-process', str(n_process),
     ]
 
     print(f"\nRunning: {' '.join(cmd)}")
@@ -258,6 +264,10 @@ Examples:
                        help="Min tokens per scene (default: 100)")
     parser.add_argument('--max-tokens', type=int, default=4096,
                        help="Max tokens per scene (default: 4096)")
+    parser.add_argument('--batch-size', type=int, default=100,
+                       help="Batch size for scene processing (default: 100)")
+    parser.add_argument('--n-process', type=int, default=12,
+                       help="Number of parallel processes (default: 12)")
 
     # Diversity sampling mode
     parser.add_argument('--auto-stop', action='store_true',
@@ -324,7 +334,9 @@ Examples:
             input_path=args.input,
             output_path=split_output,
             min_tokens=args.min_tokens,
-            max_tokens=args.max_tokens
+            max_tokens=args.max_tokens,
+            batch_size=args.batch_size,
+            n_process=args.n_process
         )
 
         if not success:
