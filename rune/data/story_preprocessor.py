@@ -142,15 +142,15 @@ class StoryPreprocessor:
 
     def process_stories_batch(self, stories: List[Dict[str, Any]], batch_size: int = 100, n_process: int = 1) -> List[Dict[str, Any]]:
         """
-        Process multiple stories with batched spaCy pipe (GPU/multiprocessing optimized).
+        Process multiple stories efficiently without unnecessary spaCy parsing.
         
-        Uses nlp.pipe() for efficient batch parsing instead of calling nlp() per story.
-        Supports CPU parallelism (n_process) and GPU if available.
+        Uses simple whitespace tokenization (fast).
+        Lazy-initializes spaCy ONLY for surname licensing via dependency analysis.
         
         Args:
             stories: List of story dicts
-            batch_size: Batch size for spaCy pipe
-            n_process: Number of processes (1=single, >1=multiprocessing)
+            batch_size: Ignored (kept for API compatibility)
+            n_process: Ignored (kept for API compatibility)
         
         Returns:
             List of processed stories (same structure as process_story)
@@ -158,66 +158,11 @@ class StoryPreprocessor:
         if not stories:
             return []
         
-        # Extract texts for batch processing
-        texts = [story["text"] for story in stories]
-        
-        # Batch parse all texts with spaCy pipe
-        docs = list(self.nlp.pipe(texts, batch_size=batch_size, n_process=n_process))
-        
-        # Process each story with its pre-parsed doc
+        # Process each story with simple tokenization
+        # spaCy will be lazy-initialized ONLY if surname licensing is needed
         results = []
-        for story, doc in zip(stories, docs):
-            # Reuse process_story logic but with pre-parsed doc
-            # Extract characters
-            characters = []
-            if "entities" in story:
-                entities = story["entities"]
-                for ent in entities:
-                    if ent.get("type") == "PERSON":
-                        characters.append({
-                            "name": ent.get("text", ent.get("name", "")),
-                            "role": ent.get("role", "supporting")
-                        })
-            elif "characters" in story:
-                characters = story.get("characters", [])
-            
-            # Build character mappings
-            char_to_role = {}
-            surname_only_variants = set()
-            for char in characters:
-                name = char["name"]
-                role = char["role"]
-                variants = self._expand_name_variants(name)
-                
-                # Detect surname-only variants
-                name_parts = name.split()
-                canonical_first = name_parts[0] if name_parts else ""
-                for variant in variants:
-                    variant_parts = variant.split()
-                    if (len(variant_parts) == 1 and 
-                        (len(name_parts) == 1 or variant.lower() != canonical_first.lower()) and
-                        variant.lower().rstrip('.') not in TITLE_TOKENS):
-                        surname_only_variants.add(variant.lower())
-                
-                for variant in variants:
-                    char_to_role[variant] = role
-            
-            # Tokenize from pre-parsed doc
-            tokens = [token.text for token in doc]
-            
-            # Generate bio-tags - call existing method with text for lazy init
-            bio_tags = self._generate_bio_tags(tokens, char_to_role, surname_only_variants, doc)
-            
-            # Create processed story
-            processed = {
-                "story_id": story.get("story_id", "unknown"),
-                "genre": story.get("metadata", {}).get("genre", "unknown"),
-                "text": story["text"],
-                "tokens": tokens,
-                "bio_tags": bio_tags,
-                "entities": self._extract_entities(tokens, bio_tags),
-            }
-            results.append(processed)
+        for story in stories:
+            results.append(self.process_story(story))
         
         return results
 
