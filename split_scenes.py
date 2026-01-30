@@ -347,40 +347,57 @@ def process_batch(
                 }
                 all_scene_data.append((story_idx, scene_idx, scene_story))
     
-    # Batch process all scenes through preprocessor
+    # Batch process all scenes through preprocessor using GPU/multiprocessing
     scene_stories = [item[2] for item in all_scene_data]
-    processed_scenes = []
+    print(f"   Processing {len(scene_stories)} scenes with batched spaCy pipe...")
+    processed_scenes = preprocessor.process_stories_batch(scene_stories, batch_size=batch_size, n_process=n_process)
     
-    for scene_story in scene_stories:
-        try:
-            # Optimization: Check if this scene even needs spaCy
-            # If no orphaned surnames, we can skip heavy preprocessing
-            entities = scene_story.get('entities', [])
-            surnames = set()
-            for ent in entities:
-                name = ent.get('text') or ent.get('name', '')
-                parts = name.split()
-                if len(parts) > 1:
-                    # Multi-token names: surname is last token
-                    surnames.add(parts[-1].lower())
-                else:
-                    # Single-token: could be surname (conservative)
-                    surnames.add(name.lower())
-            
-            # Check if scene has orphaned surnames requiring spaCy
-            needs_spacy = _has_ambiguous_surnames(scene_story['text'], surnames) if surnames else False
-            
-            # If no surname disambiguation needed, we could skip spaCy here (future optimization)
-            # For now, always call preprocessor to maintain correctness
-            processed = preprocessor.process_story(scene_story)
-            
-            # Filter by token count
-            if len(processed['tokens']) >= min_tokens:
-                processed_scenes.append(processed)
+    # Diagnostics
+    success_count = 0
+    filtered_count = 0
+    spacy_needed_count = 0
+    spacy_skipped_count = 0
+    
+    # Filter by token count and collect diagnostics
+    final_scenes = []
+    for idx, scene_story in enumerate(scene_stories):
+        processed = processed_scenes[idx]
+        
+        # Diagnostic: check if spaCy was needed
+        entities = scene_story.get('entities', [])
+        surnames = set()
+        for ent in entities:
+            name = ent.get('text') or ent.get('name', '')
+            parts = name.split()
+            if len(parts) > 1:
+                surnames.add(parts[-1].lower())
             else:
-                processed_scenes.append(None)  # Mark as filtered
-        except Exception as e:
-            processed_scenes.append(None)  # Mark as failed
+                surnames.add(name.lower())
+        
+        needs_spacy = _has_ambiguous_surnames(scene_story['text'], surnames) if surnames else False
+        if needs_spacy:
+            spacy_needed_count += 1
+        else:
+            spacy_skipped_count += 1
+        
+        # Token count filter
+        if processed and len(processed['tokens']) >= min_tokens:
+            final_scenes.append(processed)
+            success_count += 1
+        else:
+            final_scenes.append(None)
+            filtered_count += 1
+    
+    # Replace processed_scenes with filtered results
+    processed_scenes = final_scenes
+    
+    # Diagnostic summary
+    print(f"   ✅ Processing complete:")
+    print(f"      Total scenes: {len(scene_stories)}")
+    print(f"      Needed spaCy: {spacy_needed_count} ({100*spacy_needed_count//max(1, len(scene_stories))}%)")
+    print(f"      Skipped spaCy: {spacy_skipped_count} ({100*spacy_skipped_count//max(1, len(scene_stories))}%)")
+    print(f"      Kept (tokens ≥ {min_tokens}): {success_count}")
+    print(f"      Filtered (too short): {filtered_count}")
     
     # Group back by original story
     result = [[] for _ in stories]

@@ -140,6 +140,87 @@ class StoryPreprocessor:
 
         return processed
 
+    def process_stories_batch(self, stories: List[Dict[str, Any]], batch_size: int = 100, n_process: int = 1) -> List[Dict[str, Any]]:
+        """
+        Process multiple stories with batched spaCy pipe (GPU/multiprocessing optimized).
+        
+        Uses nlp.pipe() for efficient batch parsing instead of calling nlp() per story.
+        Supports CPU parallelism (n_process) and GPU if available.
+        
+        Args:
+            stories: List of story dicts
+            batch_size: Batch size for spaCy pipe
+            n_process: Number of processes (1=single, >1=multiprocessing)
+        
+        Returns:
+            List of processed stories (same structure as process_story)
+        """
+        if not stories:
+            return []
+        
+        # Extract texts for batch processing
+        texts = [story["text"] for story in stories]
+        
+        # Batch parse all texts with spaCy pipe
+        docs = list(self.nlp.pipe(texts, batch_size=batch_size, n_process=n_process))
+        
+        # Process each story with its pre-parsed doc
+        results = []
+        for story, doc in zip(stories, docs):
+            # Reuse process_story logic but with pre-parsed doc
+            # Extract characters
+            characters = []
+            if "entities" in story:
+                entities = story["entities"]
+                for ent in entities:
+                    if ent.get("type") == "PERSON":
+                        characters.append({
+                            "name": ent.get("text", ent.get("name", "")),
+                            "role": ent.get("role", "supporting")
+                        })
+            elif "characters" in story:
+                characters = story.get("characters", [])
+            
+            # Build character mappings
+            char_to_role = {}
+            surname_only_variants = set()
+            for char in characters:
+                name = char["name"]
+                role = char["role"]
+                variants = self._expand_name_variants(name)
+                
+                # Detect surname-only variants
+                name_parts = name.split()
+                canonical_first = name_parts[0] if name_parts else ""
+                for variant in variants:
+                    variant_parts = variant.split()
+                    if (len(variant_parts) == 1 and 
+                        (len(name_parts) == 1 or variant.lower() != canonical_first.lower()) and
+                        variant.lower().rstrip('.') not in TITLE_TOKENS):
+                        surname_only_variants.add(variant.lower())
+                
+                for variant in variants:
+                    char_to_role[variant] = role
+            
+            # Tokenize from pre-parsed doc
+            tokens = [token.text for token in doc]
+            
+            # Generate bio-tags - call existing method with text for lazy init
+            bio_tags = self._generate_bio_tags(tokens, char_to_role, surname_only_variants, doc)
+            
+            # Create processed story
+            processed = {
+                "story_id": story.get("story_id", "unknown"),
+                "genre": story.get("metadata", {}).get("genre", "unknown"),
+                "text": story["text"],
+                "tokens": tokens,
+                "bio_tags": bio_tags,
+                "entities": self._extract_entities(tokens, bio_tags),
+            }
+            results.append(processed)
+        
+        return results
+
     def _expand_name_variants(self, name: str) -> set:
         """
         Expand a character name into all valid variants for matching.
@@ -355,7 +436,7 @@ class StoryPreprocessor:
         return False
 
     def _generate_bio_tags(self, tokens: List[str], char_to_role: Dict[str, str], 
-                          surname_only_variants: set = None) -> List[str]:
+                          surname_only_variants: set = None, spacy_doc_precomputed=None) -> List[str]:
         """
         Generate BIO tags for ALL occurrences of known character names.
         All matched entities are tagged as PERSON (role is metadata, not NER signal).
@@ -366,6 +447,9 @@ class StoryPreprocessor:
           - Single-token names require capitalization OR title context
           - Surname-only variants require syntactic licensing (verb anchor, possessive, etc.)
           - Uses spaCy POS/dependency parsing (lazy-initialized) ONLY when surname gating is needed
+        
+        Args:
+            spacy_doc_precomputed: Optional pre-parsed spaCy doc (for batched processing)
         """
         if surname_only_variants is None:
             surname_only_variants = set()
@@ -379,7 +463,11 @@ class StoryPreprocessor:
         # Use module-level TITLE_TOKENS
         
         # Lazy-initialized spaCy doc (container to hold reference)
-        spacy_doc_ref = []
+        # If pre-computed doc is provided (from batch processing), use it directly
+        if spacy_doc_precomputed is not None:
+            spacy_doc_ref = [spacy_doc_precomputed]
+        else:
+            spacy_doc_ref = []
 
         tags = ["O"] * len(tokens)
         lowered = [t.lower().strip(".,!?;:'\"") for t in tokens]
