@@ -17,14 +17,25 @@ except ImportError:
 from ..core.schema import BioSequence, TagSchema
 from .improved_tokenizer import ImprovedTokenizer
 
+# Canonical set of title tokens - used for both variant expansion and BIO tagging
+TITLE_TOKENS = {
+    "mr", "mrs", "ms", "miss", "sir", "lady", "lord", "dr", "professor",
+    "captain", "major", "colonel", "commander", "emperor", "duke", "queen", "king",
+    "master", "detective", "officer", "agent", "lieutenant", "sergeant", "general", "admiral"
+}
+
 
 class StoryPreprocessor:
-    """Converts raw story data with character metadata into bio-tagged training format."""
+    """Converts raw story data with character metadata into bio-tagged training format.
+    
+    REQUIRES spaCy for accurate surname licensing. Install with:
+        pip install spacy
+        python -m spacy download en_core_web_sm
+    """
 
     def __init__(
         self,
         tokenizer: Optional[PreTrainedTokenizer] = None,
-        use_spacy: bool = True,
         spacy_model: str = "en_core_web_sm",
     ):
         """
@@ -32,27 +43,28 @@ class StoryPreprocessor:
 
         Args:
             tokenizer: Optional tokenizer for alignment (if None, uses whitespace)
-            use_spacy: Use spaCy for better sentence and token detection
-            spacy_model: spaCy model to use
+            spacy_model: spaCy model to use (REQUIRED)
         """
         self.tokenizer = tokenizer
-        self.use_spacy = use_spacy
 
         # Initialize improved tokenizer for punctuation handling
         self.improved_tokenizer = ImprovedTokenizer()
 
-        if use_spacy and spacy is not None:
-            try:
-                self.nlp = spacy.load(spacy_model)
-            except OSError:
-                print(f"⚠️  spaCy model '{spacy_model}' not found. Using improved tokenization.")
-                self.use_spacy = False
-                self.nlp = None
-        else:
-            if use_spacy and spacy is None:
-                print("⚠️  spaCy not installed. Using improved tokenization.")
-            self.use_spacy = False
-            self.nlp = None
+        # spaCy is REQUIRED - fail hard if not available
+        if spacy is None:
+            raise RuntimeError(
+                "spaCy is required for StoryPreprocessor.\n"
+                "Install with: pip install spacy && python -m spacy download en_core_web_sm"
+            )
+        
+        try:
+            self.nlp = spacy.load(spacy_model)
+            self.use_spacy = True
+        except OSError:
+            raise RuntimeError(
+                f"spaCy model '{spacy_model}' not found.\n"
+                f"Install with: python -m spacy download {spacy_model}"
+            )
 
     def process_story(self, story_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -85,25 +97,35 @@ class StoryPreprocessor:
 
         # Create character name mappings with expanded variants
         char_to_role = {}
+        surname_only_variants = set()  # Track standalone surnames for gating
+        
         for char in characters:
             name = char["name"]
             role = char["role"]
 
             # Expand name to all valid variants
             variants = self._expand_name_variants(name)
+            
+            # Detect surname-only variants (single-token, not first word of canonical name)
+            name_parts = name.split()
+            canonical_first = name_parts[0] if name_parts else ""
+            for variant in variants:
+                variant_parts = variant.split()
+                # Surname-only if: single token AND not the first word of canonical name AND not a title
+                if (len(variant_parts) == 1 and 
+                    variant.lower() != canonical_first.lower() and
+                    variant.lower().rstrip('.') not in TITLE_TOKENS):
+                    surname_only_variants.add(variant.lower())
 
             # Map all variants to the same role
             for variant in variants:
                 char_to_role[variant] = role
 
-        # Tokenize the text
-        if self.use_spacy and self.nlp:
-            tokens = self._tokenize_with_spacy(text)
-        else:
-            tokens = self.improved_tokenizer.split_words(text)
+        # Tokenize the text with spaCy (REQUIRED)
+        tokens = self._tokenize_with_spacy(text)
 
         # Generate bio-tags
-        bio_tags = self._generate_bio_tags(tokens, char_to_role)
+        bio_tags = self._generate_bio_tags(tokens, char_to_role, surname_only_variants)
 
         # Create processed story
         processed = {
@@ -126,6 +148,17 @@ class StoryPreprocessor:
         - "Jane Smith" should match "Jane", "Smith"
         - Normalizes punctuation (Dr. vs Dr)
 
+        ⚠️ KNOWN LIMITATION (V2):
+        Currently expands first and last names equally. Last names should require
+        contextual "licensing" (title prefix, proximity to canonical form) but this
+        gating is not yet implemented. Model learns to discriminate via context despite
+        noisy training signal.
+        
+        First names: High-confidence standalone (contextually unambiguous)
+        Last names: Should require anchors (title/proximity) - NOT IMPLEMENTED YET
+        
+        See README.md § "Name Variant Expansion: First vs. Last Names" for full policy.
+
         Args:
             name: Full canonical character name
 
@@ -135,23 +168,22 @@ class StoryPreprocessor:
         parts = name.split()
         variants = {name}  # Always include full canonical name
 
-        # Common titles to recognize
-        titles = {"Dr.", "Dr", "Mr.", "Mr", "Mrs.", "Mrs", "Ms.", "Ms", "Miss",
-                  "Captain", "Detective", "Professor", "Officer", "Agent",
-                  "Lieutenant", "Sergeant", "Colonel", "General", "Admiral"}
+        # Use canonical title set (check both original case and lowercase)
+        def is_title_word(word):
+            return word.lower().rstrip('.') in TITLE_TOKENS
 
         if len(parts) >= 3:
             # Check if first part is a title
-            if parts[0] in titles or parts[0].rstrip('.') in titles:
+            if is_title_word(parts[0]):
                 # "Dr. Alessandro Sanna" -> title, first, last
                 title = parts[0]
                 first = parts[1]
                 last = " ".join(parts[2:])  # Handle multi-word last names
 
                 variants.add(f"{title} {first}")      # "Dr. Alessandro"
-                variants.add(f"{title} {last}")       # "Dr. Sanna"
-                variants.add(first)                    # "Alessandro"
-                variants.add(last)                     # "Sanna"
+                variants.add(f"{title} {last}")       # "Dr. Sanna" ✅ SAFE: title-licensed
+                variants.add(first)                    # "Alessandro" ✅ SAFE: first name
+                variants.add(last)                     # "Sanna" ⚠️ RISK: last-name-only (V3: needs gating)
                 variants.add(f"{first} {last}")       # "Alessandro Sanna"
             else:
                 # "Alessandro Michael Sanna" -> first, middle, last
@@ -159,31 +191,35 @@ class StoryPreprocessor:
                 last = parts[-1]
                 middle = " ".join(parts[1:-1])
 
-                variants.add(first)                    # "Alessandro"
-                variants.add(last)                     # "Sanna"
+                variants.add(first)                    # "Alessandro" ✅ SAFE: first name
+                variants.add(last)                     # "Sanna" ⚠️ RISK: last-name-only (V3: needs gating)
                 variants.add(f"{first} {last}")       # "Alessandro Sanna"
 
         elif len(parts) == 2:
             # "Alessandro Sanna" or "Dr. Alessandro"
-            if parts[0] in titles or parts[0].rstrip('.') in titles:
+            if is_title_word(parts[0]):
                 # "Dr. Alessandro" -> title + name
                 title = parts[0]
                 name_part = parts[1]
-                variants.add(name_part)               # "Alessandro"
-                variants.add(f"{title} {name_part}")  # "Dr. Alessandro"
+                variants.add(name_part)               # "Alessandro" ✅ SAFE: likely first name with title
+                variants.add(f"{title} {name_part}")  # "Dr. Alessandro" ✅ SAFE: title-licensed
             else:
                 # "Alessandro Sanna" -> first + last
                 first = parts[0]
                 last = parts[1]
-                variants.add(first)                   # "Alessandro"
-                variants.add(last)                    # "Sanna"
+                # Don't add articles as standalone variants - they're not valid character references
+                articles = {"the", "a", "an"}
+                if first.lower() not in articles:
+                    variants.add(first)               # "Alessandro" ✅ SAFE: first name
+                variants.add(last)                    # "Sanna" ⚠️ RISK: last-name-only (V3: needs gating)
 
         # Normalize punctuation (Dr. vs Dr, etc.)
         normalized = set()
         for variant in variants:
             normalized.add(variant)
-            # Remove trailing periods from titles
-            if any(variant.startswith(t) for t in titles):
+            # Remove trailing periods from titles (check against canonical set)
+            variant_first = variant.split()[0].lower().rstrip('.') if variant.split() else ''
+            if variant_first in TITLE_TOKENS:
                 normalized.add(variant.rstrip('.'))
                 normalized.add(variant.replace('.', ''))
             # Add case variations
@@ -216,25 +252,137 @@ class StoryPreprocessor:
 
         return tokens
 
-    def _generate_bio_tags(self, tokens: List[str], char_to_role: Dict[str, str]) -> List[str]:
+    def _check_surname_licensing(self, tokens: List[str], lowered: List[str], 
+                                 idx: int, spacy_doc, ARTICLES: set) -> bool:
         """
-        Generate BIO tags with smarter contextual gating:
-          - Titles (Mr., Dr., etc.) are kept as O but provide context for next token
-          - Surnames are only labeled if preceded by a title or part of a known multi-word name
-          - Prevents false positives like "the lamp" or "the cook"
+        Check if a surname at position idx has syntactic licensing to be tagged.
+        
+        Uses spaCy syntax analysis (REQUIRED - fails if spaCy unavailable).
+        
+        Returns True if licensed (should tag), False otherwise.
         """
-        TITLE_TOKENS = {
-            "mr", "mrs", "ms", "miss", "sir", "lady", "lord", "dr", "professor",
-            "captain", "major", "colonel", "commander", "emperor", "duke", "queen", "king"
-        }
+        if spacy_doc is None:
+            raise RuntimeError("spaCy is required for surname licensing. Install: pip install spacy && python -m spacy download en_core_web_sm")
+        
+        # Find the spaCy token that matches our token at idx
+        # Use text matching since tokenization might differ
+        token_text = tokens[idx]
+        spacy_token = None
+        
+        # Search for matching token in spaCy doc
+        for st in spacy_doc:
+            if st.text == token_text or st.text.lower() == token_text.lower():
+                # Additional check: position should be roughly aligned
+                # (allow some drift but not huge gaps)
+                if abs(st.i - idx) < 5:
+                    spacy_token = st
+                    break
+        
+        if spacy_token is None:
+            # Token not found in spaCy doc - likely tokenization mismatch
+            # Check simple pattern: capitalized predecessor or verb neighbor
+            prev_token_actual = tokens[idx-1] if idx > 0 else ""
+            next_token = lowered[idx+1] if idx+1 < len(lowered) else ""
+            prev_lower = lowered[idx-1] if idx > 0 else ""
+            prev_is_capitalized = prev_token_actual and prev_token_actual[0].isupper()
+            prev_is_article = prev_lower in ARTICLES
+            
+            # Allow if: capitalized non-article predecessor
+            return prev_is_capitalized and not prev_is_article
+        
+        # Check syntactic roles that license surnames
+        # 1. Subject of a verb (nsubj/nsubjpass)
+        if spacy_token.dep_ in ("nsubj", "nsubjpass"):
+            return True
+        
+        # 2. Token itself is possessive marker
+        # e.g., "Holmes's coat" → Holmes has dep_=poss
+        if spacy_token.dep_ == "poss":
+            return True
+        
+        # 3. Vocative or appositive (direct address)
+        if spacy_token.dep_ in ("appos", "vocative"):
+            return True
+        
+        # 4. Subject-verb inversion for dialogue tags: "remarked Holmes", "said Watson"
+        # In these patterns, the name is dobj (not nsubj) but follows a speech verb
+        # We want "remarked Holmes" (Holmes is dobj after speech verb) ✅
+        # But NOT "named Norton" (Norton is oprd after naming verb) ❌
+        SPEECH_VERBS = {"say", "remark", "ask", "reply", "answer", "whisper", "shout",
+                        "exclaim", "mutter", "continue", "call", "cry", "yell"}
+        
+        if spacy_token.dep_ == "dobj":
+            # Check if the head verb is a speech verb
+            head_verb = spacy_token.head
+            if head_verb.pos_ == "VERB" and head_verb.lemma_.lower() in SPEECH_VERBS:
+                return True
+        
+        # 5. Capitalized non-article predecessor (first name pattern)
+        # BUT: Exclude if predecessor is a non-speech verb (e.g., "named Norton", "called John")
+        # We want "Elizabeth Bennet" ✅ but NOT "named Norton" ❌
+        if idx > 0:
+            prev_token = tokens[idx-1]
+            prev_lower = lowered[idx-1]
+            if prev_token and prev_token[0].isupper() and prev_lower not in ARTICLES:
+                # Check if previous token is a verb in spaCy
+                # Find the spaCy token for the previous token
+                try:
+                    prev_spacy_i = max(0, spacy_token.i - 1)
+                    prev_spacy = spacy_doc[prev_spacy_i]
+                    
+                    # Allow if previous is NOT a verb, OR if it IS a speech verb
+                    if prev_spacy.pos_ != "VERB":
+                        return True
+                    elif prev_spacy.lemma_.lower() in SPEECH_VERBS:
+                        return True
+                    # Otherwise it's a non-speech verb (like "named") - don't license
+                except:
+                    # If we can't check spaCy, be conservative and allow it
+                    return True
+        
+        # No licensing found
+        return False
 
-        COMMON_NOUNS = {
-            "lamp", "cook", "light", "shadow", "hope", "grace", "storm", "song", "flame",
-            "river", "stone", "oak", "rose"
-        }
+    def _generate_bio_tags(self, tokens: List[str], char_to_role: Dict[str, str], 
+                          surname_only_variants: set = None) -> List[str]:
+        """
+        Generate BIO tags for ALL occurrences of known character names.
+        All matched entities are tagged as PERSON (role is metadata, not NER signal).
+        
+        Strategy:
+          - Titles (Mr., Dr., etc.) are kept as O but provide context for next token
+          - Always match LONGEST name variant first (greedy matching)
+          - Single-token names require capitalization OR title context
+          - Surname-only variants require syntactic licensing (verb anchor, possessive, etc.)
+          - Uses spaCy POS/dependency parsing when available for accurate syntax
+        """
+        if surname_only_variants is None:
+            surname_only_variants = set()
+            
+        ARTICLES = {"the", "a", "an"}  # Lowercase article set
+        
+        # Parse with spaCy for syntactic analysis (REQUIRED)
+        # Reconstruct text from tokens for spaCy parsing
+        text = " ".join(tokens)
+        spacy_doc = self.nlp(text)
+        
+        # Use module-level TITLE_TOKENS
 
         tags = ["O"] * len(tokens)
-        lowered = [t.lower().strip(".,!?;:") for t in tokens]
+        lowered = [t.lower().strip(".,!?;:'\"") for t in tokens]
+        
+        # Pre-compute name variants grouped by token length (longest first)
+        # This ensures we always match the longest possible name
+        variants_by_length = {}
+        max_length = 1
+        for variant in char_to_role.keys():
+            # Count tokens in this variant
+            var_tokens = variant.split()
+            length = len(var_tokens)
+            max_length = max(max_length, length)
+            if length not in variants_by_length:
+                variants_by_length[length] = set()
+            variants_by_length[length].add(variant)
 
         i = 0
         while i < len(tokens):
@@ -245,61 +393,119 @@ class StoryPreprocessor:
                 i += 1
                 continue
 
-            # (2) Look ahead and behind for context
-            # Find previous non-empty token (skip punctuation)
+            # (2) Look behind for title context
             prev_tok = ""
             for k in range(i - 1, max(-1, i - 4), -1):
-                if k >= 0 and lowered[k]:  # Non-empty
+                if k >= 0 and lowered[k] and lowered[k] not in '.,!?;:\'"':
                     prev_tok = lowered[k]
                     break
 
-            next_tok = lowered[i + 1] if i < len(tokens) - 1 else ""
+            # (3) Check for entity matches, LONGEST FIRST
+            matched = False
+            window = 0
+            
+            # Try from longest possible down to 1
+            for w in range(min(max_length, len(tokens) - i), 0, -1):
+                if w not in variants_by_length:
+                    continue
+                span = " ".join(lowered[i:i + w])
+                if span in variants_by_length[w]:
+                    matched = True
+                    window = w
+                    break
 
-            # (3) Check for multi-token entity matches (3-, 2-, or 1-gram)
-            matched_role = None
-            window = 1
-            for w in (3, 2, 1):
-                if i + w <= len(tokens):
-                    span = " ".join(lowered[i:i + w])
-                    if span in char_to_role:
-                        matched_role = char_to_role[span]
-                        window = w
-                        break
-
-            if not matched_role:
+            if not matched:
                 i += 1
                 continue
 
-            # (5) Contextual gating for single surnames
-            # Allow only if preceded by title or part of known multi-word variant
+            # (4) For single-token matches, apply stricter rules
             if window == 1:
-                skip_token = False
-
-                if tok in COMMON_NOUNS:
-                    # Ambiguous word, skip if not capitalized mid-sentence
-                    if tokens[i][0].islower():
-                        skip_token = True
-
-                if not skip_token and prev_tok not in TITLE_TOKENS and f"{prev_tok} {tok}" not in char_to_role:
-                    # Standalone surname without cue → skip
-                    skip_token = True
-
-                if skip_token:
+                is_capitalized = tokens[i][0].isupper() if tokens[i] else False
+                has_title_context = prev_tok in TITLE_TOKENS
+                
+                # Skip lowercase without title
+                if not is_capitalized and not has_title_context:
+                    i += 1
+                    continue
+                
+                # SURNAME GATING: Standalone surnames require licensing context
+                # Uses spaCy syntax when available, falls back to pattern matching
+                # Blocks: "the Bennet girls", "The Bennet sisters" (article-prefixed)
+                # Allows: "Mr. Bennet" (title), "said Holmes" (verb anchor), "Holmes's" (possessive)
+                if tok in surname_only_variants:
+                    # Exception 1: if preceded by a title, always allow (e.g., "Mr. Bennet")
+                    if has_title_context:
+                        pass  # Allow - title-licensed surname
+                    else:
+                        # Check syntactic licensing using spaCy or fallback patterns
+                        is_licensed = self._check_surname_licensing(
+                            tokens, lowered, i, spacy_doc, ARTICLES
+                        )
+                        
+                        if not is_licensed:
+                            # No licensing context - block
+                            i += 1
+                            continue
+                
+                # Additional check: Block names that are objects of naming/calling verbs
+                # E.g., "named Norton", "called John" - these are weak introductory mentions
+                # Use spaCy to detect oprd/attr dependencies after naming verbs
+                if spacy_doc and window == 1:  # Only for single-token matches
+                    # Find this token in spaCy doc - use original token text, not lowered
+                    # Search near the same position, but be more precise
+                    original_tok = tokens[i]
+                    spacy_token = None
+                    
+                    # First try exact position match
+                    if i < len(spacy_doc) and spacy_doc[i].text == original_tok:
+                        spacy_token = spacy_doc[i]
+                    else:
+                        # Search nearby (within +/- 2 positions)
+                        for offset in range(-2, 3):
+                            idx = i + offset
+                            if 0 <= idx < len(spacy_doc) and spacy_doc[idx].text == original_tok:
+                                spacy_token = spacy_doc[idx]
+                                break
+                    
+                    if spacy_token:
+                        # Check if it's an object predicate of a naming verb
+                        # NOTE: We check oprd/attr (not dobj) because:
+                        # - "named Norton" → Norton is oprd (object predicate) → BLOCK
+                        # - "called Norton" → Norton is dobj (direct object in speech) → ALLOW (checked later)
+                        NAMING_VERBS = {"name", "call", "dub", "christen"}
+                        if spacy_token.dep_ in ("oprd", "attr"):  # Removed "dobj" - that's for speech verbs
+                            head_verb = spacy_token.head
+                            if head_verb.pos_ == "VERB" and head_verb.lemma_.lower() in NAMING_VERBS:
+                                # Block: "named Norton", "a man called John" (naming context)
+                                i += 1
+                                continue
+                
+                # Additional check: if token is a common word/number AND no title context, skip
+                # This prevents "Three" in "Three more weeks" from being tagged
+                ambiguous_tokens = {
+                    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+                    "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
+                    "eighteen", "nineteen", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+                    "eighty", "ninety", "hundred", "thousand"
+                }
+                
+                if tok in ambiguous_tokens and not has_title_context:
+                    # Require multi-token match or title context for number names
                     i += 1
                     continue
 
-            # (6) Apply BIO tags
-            tags[i] = f"B-{matched_role}"
+            # (5) Apply BIO tags - all entities tagged as PERSON
+            tags[i] = "B-PERSON"
             for j in range(1, window):
                 if i + j < len(tokens):
-                    tags[i + j] = f"I-{matched_role}"
+                    tags[i + j] = "I-PERSON"
 
             i += window
 
         return tags
 
     def _extract_entities(self, tokens: List[str], bio_tags: List[str]) -> List[Dict[str, Any]]:
-        """Extract entity information from tokens and tags."""
+        """Extract entity information from tokens and tags. All entities are PERSON type."""
         entities = []
         current_entity = None
 
@@ -310,19 +516,17 @@ class StoryPreprocessor:
                     entities.append(current_entity)
 
                 # Start new entity
-                role = tag[2:]
                 current_entity = {
                     "text": token,
-                    "label": "PERSON",  # All characters are persons
-                    "role": role,
+                    "label": "PERSON",
                     "start": i,
-                    "end": i,
+                    "end": i + 1,
                 }
 
             elif tag.startswith("I-") and current_entity:
                 # Continue current entity
                 current_entity["text"] += " " + token
-                current_entity["end"] = i
+                current_entity["end"] = i + 1
 
             else:
                 # End current entity

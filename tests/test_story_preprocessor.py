@@ -16,8 +16,8 @@ from rune.data.story_preprocessor import StoryPreprocessor
 
 @pytest.fixture
 def preprocessor():
-    """Create a preprocessor instance without spaCy for consistent testing."""
-    return StoryPreprocessor(use_spacy=False)
+    """Create a preprocessor instance with spaCy (now mandatory)."""
+    return StoryPreprocessor()
 
 
 class TestContextualLabeling:
@@ -35,9 +35,10 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        # Mr. and . should be O, Bennet should be B-protagonist
-        assert processed["tokens"] == ["Mr", ".", "Bennet", "arrived", "at", "the", "door", "."]
-        assert processed["bio_tags"] == ["O", "O", "B-protagonist", "O", "O", "O", "O", "O"]
+        # spaCy tokenizes "Mr." as one token, followed by "Bennet"
+        # Mr. should be O, Bennet should be B-PERSON
+        assert processed["tokens"] == ["Mr.", "Bennet", "arrived", "at", "the", "door", "."]
+        assert processed["bio_tags"] == ["O", "B-PERSON", "O", "O", "O", "O", "O"]
 
     def test_title_with_surname(self, preprocessor):
         """Title + surname (Dr. Lamp) should label surname correctly."""
@@ -51,7 +52,8 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        assert processed["bio_tags"] == ["O", "O", "B-protagonist", "O", "O", "O", "O"]
+        # spaCy tokenizes "Dr." as one token
+        assert processed["bio_tags"] == ["O", "B-PERSON", "O", "O", "O", "O"]
 
     def test_common_noun_collision_prevented(self, preprocessor):
         """Common nouns like 'the cook' should NOT be labeled when ambiguous."""
@@ -80,8 +82,8 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        # Cook should be B-supporting because preceded by title
-        assert processed["bio_tags"] == ["O", "O", "B-supporting", "O", "O", "O"]
+        # Cook should be B-PERSON because preceded by title (Mr. is one token)
+        assert processed["bio_tags"] == ["O", "B-PERSON", "O", "O", "O"]
 
     def test_full_name_without_title(self, preprocessor):
         """Full names should work normally without titles."""
@@ -95,7 +97,7 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        assert processed["bio_tags"] == ["B-supporting", "I-supporting", "O", "O", "O"]
+        assert processed["bio_tags"] == ["B-PERSON", "I-PERSON", "O", "O", "O"]
 
     def test_multiple_titles(self, preprocessor):
         """Multiple titles (Lady/Sir) should be handled correctly."""
@@ -110,10 +112,10 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        assert processed["bio_tags"] == ["O", "B-supporting", "O", "O", "B-supporting", "O", "O"]
+        assert processed["bio_tags"] == ["O", "B-PERSON", "O", "O", "B-PERSON", "O", "O"]
 
-    def test_sentence_start_capitalization_ambiguous(self, preprocessor):
-        """Capitalized surnames at sentence start should be skipped if ambiguous."""
+    def test_sentence_start_capitalization_tags_names(self, preprocessor):
+        """Capitalized names at sentence start should be tagged (maximize recall)."""
         story = {
             "story_id": "test7",
             "text": "The door opened. Cook arrived with supplies.",
@@ -124,8 +126,9 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        # Cook at sentence start without title should be skipped
-        assert processed["bio_tags"] == ["O", "O", "O", "O", "O", "O", "O", "O", "O"]
+        # Cook is capitalized and a known character variant - should be tagged
+        # The model learns from context whether it's a name or noun
+        assert processed["bio_tags"] == ["O", "O", "O", "O", "B-PERSON", "O", "O", "O", "O"]
 
     def test_title_mid_sentence(self, preprocessor):
         """Title mid-sentence provides clear context."""
@@ -139,8 +142,8 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        # Cook should be labeled because preceded by Mr.
-        assert processed["bio_tags"] == ["O", "O", "O", "O", "O", "B-supporting", "O", "O", "O", "O"]
+        # Cook should be labeled because preceded by Mr. (spaCy tokenizes Mr. as one token)
+        assert processed["bio_tags"] == ["O", "O", "O", "O", "B-PERSON", "O", "O", "O", "O"]
 
 
 class TestNameVariantExpansion:
@@ -199,7 +202,6 @@ class TestEntityExtraction:
 
         assert len(entities) == 1
         assert entities[0]["text"] == "Elizabeth Bennet"
-        assert entities[0]["role"] == "protagonist"
         assert entities[0]["label"] == "PERSON"
 
     def test_multi_token_entity_extraction(self, preprocessor):
@@ -217,7 +219,7 @@ class TestEntityExtraction:
 
         assert len(entities) == 1
         assert entities[0]["text"] == "James Cook"
-        assert entities[0]["role"] == "supporting"
+        assert entities[0]["label"] == "PERSON"
 
     def test_multiple_entities(self, preprocessor):
         """Should extract multiple entities in order."""
@@ -253,7 +255,7 @@ class TestDataFormatSupport:
 
         processed = preprocessor.process_story(story)
 
-        assert processed["bio_tags"] == ["B-protagonist", "I-protagonist", "O", "O"]
+        assert processed["bio_tags"] == ["B-PERSON", "I-PERSON", "O", "O"]
 
     def test_characters_format_legacy(self, preprocessor):
         """Should support legacy characters format."""
@@ -267,7 +269,7 @@ class TestDataFormatSupport:
 
         processed = preprocessor.process_story(story)
 
-        assert processed["bio_tags"] == ["B-protagonist", "I-protagonist", "O", "O"]
+        assert processed["bio_tags"] == ["B-PERSON", "I-PERSON", "O", "O"]
 
     def test_entities_filters_non_person(self, preprocessor):
         """Should filter out non-PERSON entities."""
@@ -283,7 +285,7 @@ class TestDataFormatSupport:
         processed = preprocessor.process_story(story)
 
         # Only James Cook should be labeled, not London
-        assert processed["bio_tags"] == ["B-protagonist", "I-protagonist", "O", "O", "O"]
+        assert processed["bio_tags"] == ["B-PERSON", "I-PERSON", "O", "O", "O"]
 
     def test_empty_entities(self, preprocessor):
         """Should handle stories with no entities gracefully."""
@@ -342,10 +344,9 @@ class TestEdgeCases:
 
         processed = preprocessor.process_story(story)
 
-        # Check each character has correct role
-        assert "B-protagonist" in processed["bio_tags"]
-        assert "B-supporting" in processed["bio_tags"]
-        assert "B-antagonist" in processed["bio_tags"]
+        # All characters should be tagged as PERSON (role-agnostic)
+        assert processed["bio_tags"].count("B-PERSON") == 3
+        assert processed["bio_tags"].count("I-PERSON") == 3
 
 
 class TestCommonNounHandling:
@@ -378,8 +379,8 @@ class TestCommonNounHandling:
 
         processed = preprocessor.process_story(story)
 
-        # Lamp should be B-protagonist because preceded by Dr.
-        assert processed["bio_tags"][2] == "B-protagonist"
+        # Lamp should be B-PERSON because preceded by Dr.
+        assert processed["tokens"][1] == "Lamp" and processed["bio_tags"][1] == "B-PERSON"
 
     def test_common_noun_in_full_name(self, preprocessor):
         """Common nouns in full names should be labeled."""
@@ -394,8 +395,352 @@ class TestCommonNounHandling:
         processed = preprocessor.process_story(story)
 
         # Helena Lamp should both be labeled
-        assert processed["bio_tags"][0] == "B-protagonist"
-        assert processed["bio_tags"][1] == "I-protagonist"
+        assert processed["bio_tags"][0] == "B-PERSON"
+        assert processed["bio_tags"][1] == "I-PERSON"
+
+
+class TestSpaCySurnameGating:
+    """
+    Test spaCy-based surname licensing with dependency parsing.
+    
+    These tests ensure the preprocessor correctly distinguishes:
+    - Functional entity mentions (actors with agency) ✅ TAG
+    - Weak metadata mentions (names in passing) ❌ BLOCK
+    
+    Critical for preventing false positives while maintaining high recall.
+    """
+
+    def test_surname_as_subject_nsubj(self, preprocessor):
+        """
+        CASE: Subject of verb (nsubj dependency)
+        EXAMPLE: "Holmes rushed at the door"
+        JUSTIFICATION: Name is performing an action → functional entity mention → TAG
+        spaCy: "Holmes" has dep_=nsubj, head="rushed" (VERB)
+        """
+        story = {
+            "story_id": "test",
+            "text": "Holmes rushed at the door.",
+            "characters": [
+                {"name": "Sherlock Holmes", "role": "PROTAGONIST"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Holmes should be tagged (nsubj of "rushed")
+        assert processed["tokens"][0] == "Holmes"
+        assert processed["bio_tags"][0] == "B-PERSON", "Subject of verb should be tagged"
+
+    def test_surname_after_speech_verb_dobj(self, preprocessor):
+        """
+        CASE: Object of speech verb (subject-verb inversion in dialogue)
+        EXAMPLE: "remarked Holmes quietly"
+        JUSTIFICATION: Standard dialogue attribution pattern → functional entity → TAG
+        spaCy: "Holmes" has dep_=dobj, head="remarked" (VERB, lemma in SPEECH_VERBS)
+        """
+        story = {
+            "story_id": "test",
+            "text": "The case was simple, remarked Holmes quietly.",
+            "characters": [
+                {"name": "Sherlock Holmes", "role": "PROTAGONIST"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Find Holmes in tokens
+        holmes_idx = processed["tokens"].index("Holmes")
+        assert processed["bio_tags"][holmes_idx] == "B-PERSON", "Surname after speech verb should be tagged"
+
+    def test_naming_verb_blocks_single_token_name(self, preprocessor):
+        """
+        CASE: Object of naming verb (oprd/attr dependency)
+        EXAMPLE: "To an English lawyer named Norton"
+        JUSTIFICATION: Weak introductory metadata, not functional mention → BLOCK
+        spaCy: "Norton" has dep_=oprd, head="named" (VERB, lemma="name")
+        
+        CRITICAL: This prevents tagging names that appear only as labels/identifiers
+        in byline/introduction context. The functional mention comes later when
+        the character actually acts: "Norton entered the room" → that one gets tagged.
+        """
+        story = {
+            "story_id": "test",
+            "text": "To an English lawyer named Norton.",
+            "characters": [
+                {"name": "Norton", "role": "MINOR"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Norton should NOT be tagged (oprd of naming verb "named")
+        norton_idx = processed["tokens"].index("Norton")
+        assert processed["bio_tags"][norton_idx] == "O", "Object of naming verb should be blocked"
+
+    def test_naming_verb_blocks_but_later_action_tags(self, preprocessor):
+        """
+        CASE: Same name first introduced via naming verb, then used functionally
+        EXAMPLE: "lawyer named Norton. Norton entered"
+        JUSTIFICATION: First mention is metadata → BLOCK. Second is action → TAG.
+        
+        This validates that our naming-verb filter is position-specific (uses
+        exact token alignment) and doesn't globally block all instances of a name.
+        """
+        story = {
+            "story_id": "test",
+            "text": "To a lawyer named Norton. Norton entered the room.",
+            "characters": [
+                {"name": "Norton", "role": "MINOR"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Find both Norton instances
+        norton_indices = [i for i, tok in enumerate(processed["tokens"]) if tok == "Norton"]
+        assert len(norton_indices) == 2, "Should find two Norton tokens"
+
+        # First Norton (after "named") should be blocked
+        assert processed["bio_tags"][norton_indices[0]] == "O", "First Norton (named) should be blocked"
+
+        # Second Norton (subject of "entered") should be tagged
+        assert processed["bio_tags"][norton_indices[1]] == "B-PERSON", "Second Norton (subject) should be tagged"
+
+    def test_article_prefix_blocks_surname(self, preprocessor):
+        """
+        CASE: Article-prefixed surname
+        EXAMPLE: "the Bennet girls", "The Bennet sisters"
+        JUSTIFICATION: "the X" indicates role/descriptor, not a name → BLOCK
+        
+        Policy heuristic: "Can you add 'the' and it still makes sense?"
+        If yes → role/title → O-tag
+        """
+        story = {
+            "story_id": "test",
+            "text": "The Bennet sisters arrived.",
+            "characters": [
+                {"name": "Elizabeth Bennet", "role": "PROTAGONIST"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Bennet should NOT be tagged (article-prefixed)
+        bennet_idx = processed["tokens"].index("Bennet")
+        assert processed["bio_tags"][bennet_idx] == "O", "Article-prefixed surname should be blocked"
+
+    def test_title_prefix_allows_surname(self, preprocessor):
+        """
+        CASE: Title-prefixed surname
+        EXAMPLE: "Mr. Bennet arrived"
+        JUSTIFICATION: Title explicitly marks this as a name → TAG
+        
+        This is one of the strongest licensing contexts for standalone surnames.
+        """
+        story = {
+            "story_id": "test",
+            "text": "Mr. Bennet arrived at the door.",
+            "characters": [
+                {"name": "Fitzwilliam Bennet", "role": "SUPPORTING"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Bennet should be tagged (title-licensed)
+        bennet_idx = processed["tokens"].index("Bennet")
+        assert processed["bio_tags"][bennet_idx] == "B-PERSON", "Title-prefixed surname should be tagged"
+
+    def test_surname_with_possessive(self, preprocessor):
+        """
+        CASE: Surname with possessive marker
+        EXAMPLE: "Holmes's coat", "Bennet's eyes"
+        JUSTIFICATION: Possessive indicates ownership/agency → functional entity → TAG
+        spaCy: Token has child with dep_=poss
+        """
+        story = {
+            "story_id": "test",
+            "text": "Holmes's coat was threadbare.",
+            "characters": [
+                {"name": "Sherlock Holmes", "role": "PROTAGONIST"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Holmes should be tagged (has possessive marker)
+        holmes_idx = processed["tokens"].index("Holmes")
+        assert processed["bio_tags"][holmes_idx] == "B-PERSON", "Surname with possessive should be tagged"
+
+    def test_first_name_prefix_allows_surname(self, preprocessor):
+        """
+        CASE: First name + surname combination
+        EXAMPLE: "Elizabeth Bennet smiled"
+        JUSTIFICATION: Multi-word names always tagged → both tokens get labels
+        
+        This is the most reliable pattern - full names should always be tagged.
+        """
+        story = {
+            "story_id": "test",
+            "text": "Elizabeth Bennet smiled at him.",
+            "characters": [
+                {"name": "Elizabeth Bennet", "role": "PROTAGONIST"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Both tokens should be tagged
+        assert processed["bio_tags"][0] == "B-PERSON"
+        assert processed["bio_tags"][1] == "I-PERSON"
+
+    def test_multiple_speech_verbs(self, preprocessor):
+        """
+        CASE: Various speech verbs in dialogue attribution
+        EXAMPLES: "said Holmes", "whispered Watson", "exclaimed Lestrade"
+        JUSTIFICATION: All standard dialogue verbs should license surnames
+        
+        SPEECH_VERBS = {say, remark, ask, reply, answer, whisper, shout, exclaim, mutter, continue}
+        """
+        test_cases = [
+            ("She was wrong, said Holmes.", "Holmes"),
+            ("Not quite, whispered Watson.", "Watson"),
+            ("Impossible, exclaimed Lestrade.", "Lestrade"),
+        ]
+
+        for text, expected_name in test_cases:
+            story = {
+                "story_id": "test",
+                "text": text,
+                "characters": [
+                    {"name": f"John {expected_name}", "role": "SUPPORTING"}
+                ]
+            }
+
+            processed = preprocessor.process_story(story)
+
+            # Find the surname in tokens
+            name_idx = processed["tokens"].index(expected_name)
+            assert processed["bio_tags"][name_idx] == "B-PERSON", \
+                f"Surname after speech verb should be tagged in: {text}"
+
+    def test_called_vs_named_distinction(self, preprocessor):
+        """
+        CASE: "called" as naming verb vs. speech verb
+        EXAMPLES: 
+          - "a man called Norton" (naming) → BLOCK
+          - "called Sherlock Holmes" (speech, multi-word name) → TAG
+        
+        JUSTIFICATION: Same verb, different syntactic roles
+        - Naming verb: Norton is object predicate (oprd/attr)
+        - Speech verb: Holmes is dobj (direct object), but full name always tags
+        
+        NOTE: Single-word names after "called" are ambiguous - we test the clearer cases
+        """
+        # Naming verb context - should block single-word name
+        story1 = {
+            "story_id": "test1",
+            "text": "A man called Norton arrived.",
+            "characters": [{"name": "Norton", "role": "MINOR"}]
+        }
+        processed1 = preprocessor.process_story(story1)
+        norton_idx1 = processed1["tokens"].index("Norton")
+        assert processed1["bio_tags"][norton_idx1] == "O", \
+            "Norton in 'called Norton' (naming verb) should be blocked"
+
+        # Speech verb with multi-word name - should tag
+        story2 = {
+            "story_id": "test2",
+            "text": "Come here, called Sherlock Holmes.",
+            "characters": [{"name": "Sherlock Holmes", "role": "PROTAGONIST"}]
+        }
+        processed2 = preprocessor.process_story(story2)
+        sherlock_idx = processed2["tokens"].index("Sherlock")
+        assert processed2["bio_tags"][sherlock_idx] == "B-PERSON"
+        assert processed2["bio_tags"][sherlock_idx + 1] == "I-PERSON", \
+            "Multi-word name after 'called' should be fully tagged"
+
+    def test_article_vs_first_name_capitalized_predecessor(self, preprocessor):
+        """
+        CASE: Distinguishing capitalized articles from first names
+        EXAMPLES:
+          - "The Bennet sisters" (article) → BLOCK
+          - "Elizabeth Bennet" (first name) → TAG
+        
+        JUSTIFICATION: Check #5 in surname licensing requires non-article predecessor
+        ARTICLES = {"the", "a", "an"} (case-insensitive check)
+        """
+        # Article case
+        story1 = {
+            "story_id": "test1",
+            "text": "The Bennet family was large.",
+            "characters": [{"name": "Elizabeth Bennet", "role": "PROTAGONIST"}]
+        }
+        processed1 = preprocessor.process_story(story1)
+        bennet_idx1 = processed1["tokens"].index("Bennet")
+        assert processed1["bio_tags"][bennet_idx1] == "O", \
+            "'The Bennet' should be blocked (article prefix)"
+
+        # First name case
+        story2 = {
+            "story_id": "test2",
+            "text": "Elizabeth Bennet was clever.",
+            "characters": [{"name": "Elizabeth Bennet", "role": "PROTAGONIST"}]
+        }
+        processed2 = preprocessor.process_story(story2)
+        assert processed2["bio_tags"][0] == "B-PERSON"
+        assert processed2["bio_tags"][1] == "I-PERSON", \
+            "'Elizabeth Bennet' should be fully tagged (first name + surname)"
+
+
+class TestCommonNounHandling:
+    """Test handling of common nouns that can be surnames."""
+
+    def test_common_noun_lowercase(self, preprocessor):
+        """Lowercase common nouns should not be labeled."""
+        story = {
+            "story_id": "test",
+            "text": "The lamp flickered.",
+            "entities": [
+                {"text": "Helena Lamp", "type": "PERSON", "role": "protagonist"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # 'lamp' should be O
+        assert processed["bio_tags"] == ["O", "O", "O", "O"]
+
+    def test_common_noun_with_title(self, preprocessor):
+        """Common nouns with titles should be labeled."""
+        story = {
+            "story_id": "test",
+            "text": "Dr. Lamp examined the patient.",
+            "entities": [
+                {"text": "Helena Lamp", "type": "PERSON", "role": "protagonist"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Lamp should be B-PERSON because preceded by Dr.
+        assert processed["tokens"][1] == "Lamp" and processed["bio_tags"][1] == "B-PERSON"
+
+    def test_common_noun_in_full_name(self, preprocessor):
+        """Common nouns in full names should be labeled."""
+        story = {
+            "story_id": "test",
+            "text": "Helena Lamp examined the patient.",
+            "entities": [
+                {"text": "Helena Lamp", "type": "PERSON", "role": "protagonist"}
+            ]
+        }
+
+        processed = preprocessor.process_story(story)
+
+        # Helena Lamp should both be labeled
+        assert processed["bio_tags"][0] == "B-PERSON"
+        assert processed["bio_tags"][1] == "I-PERSON"
 
 
 if __name__ == "__main__":
