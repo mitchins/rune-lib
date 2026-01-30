@@ -268,6 +268,7 @@ def process_batch(
     preprocessor: Optional[StoryPreprocessor],
     min_tokens: int,
     max_tokens: int,
+    batch_size: int = 100,
     n_process: int = 1
 ) -> List[List[Dict[str, Any]]]:
     """
@@ -470,6 +471,7 @@ def main():
                 preprocessor,
                 min_tokens=args.min_tokens,
                 max_tokens=args.max_tokens,
+                batch_size=args.batch_size if needs_preprocessing else 100,
                 n_process=args.n_process if needs_preprocessing else 1
             )
             
