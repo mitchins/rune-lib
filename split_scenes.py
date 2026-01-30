@@ -17,11 +17,40 @@ Output: Scene-split JSONL with more training examples
 import json
 import argparse
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set
 from pathlib import Path
 from tqdm import tqdm
-from rune.data.story_preprocessor import StoryPreprocessor
+from rune.data.story_preprocessor import StoryPreprocessor, TITLE_TOKENS
 
+
+def _has_ambiguous_surnames(text: str, surnames: Set[str]) -> bool:
+    """
+    Check if text contains any surnames WITHOUT a title marker.
+    
+    This determines if spaCy parsing is needed for dependency analysis.
+    If all surname occurrences have title markers (Mr., Dr., etc.), 
+    we can skip spaCy entirely.
+    
+    Returns True only if an actual surname appears without title context.
+    """
+    if not surnames:
+        return False
+    
+    lowered = [t.lower().rstrip('.,!?;:') for t in text.replace('\n', ' ').split()]
+    
+    for i, tok in enumerate(lowered):
+        if tok in surnames:
+            # Check if preceded by title within 2 tokens
+            has_title = False
+            for j in range(max(0, i-2), i):
+                if lowered[j].rstrip('.') in TITLE_TOKENS:
+                    has_title = True
+                    break
+            if not has_title:
+                # Found an orphaned surname
+                return True
+    
+    return False
 
 
 def split_story_at_scenes(
@@ -324,7 +353,27 @@ def process_batch(
     
     for scene_story in scene_stories:
         try:
+            # Optimization: Check if this scene even needs spaCy
+            # If no orphaned surnames, we can skip heavy preprocessing
+            entities = scene_story.get('entities', [])
+            surnames = set()
+            for ent in entities:
+                name = ent.get('text') or ent.get('name', '')
+                parts = name.split()
+                if len(parts) > 1:
+                    # Multi-token names: surname is last token
+                    surnames.add(parts[-1].lower())
+                else:
+                    # Single-token: could be surname (conservative)
+                    surnames.add(name.lower())
+            
+            # Check if scene has orphaned surnames requiring spaCy
+            needs_spacy = _has_ambiguous_surnames(scene_story['text'], surnames) if surnames else False
+            
+            # If no surname disambiguation needed, we could skip spaCy here (future optimization)
+            # For now, always call preprocessor to maintain correctness
             processed = preprocessor.process_story(scene_story)
+            
             # Filter by token count
             if len(processed['tokens']) >= min_tokens:
                 processed_scenes.append(processed)
