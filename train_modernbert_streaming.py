@@ -818,7 +818,7 @@ Examples:
             tokenizer=tokenizer,
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)] if stage1_val else [],
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if stage1_val else [],
         )
         
         print(f"🏋️ Stage 1 training ({args.curriculum_stage1_epochs} epochs)...")
@@ -906,7 +906,7 @@ Examples:
             tokenizer=tokenizer,
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)] if stage2_val else [],
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if stage2_val else [],
         )
         
         print(f"🏋️ Stage 2 training ({args.curriculum_stage2_epochs} epochs)...")
@@ -947,7 +947,7 @@ Examples:
             tokenizer=tokenizer,
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)] if final_eval_dataset else [],
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if final_eval_dataset else [],
         )
         
         resume_checkpoint = args.resume_from_checkpoint
