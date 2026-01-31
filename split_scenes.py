@@ -60,32 +60,38 @@ def split_story_at_scenes(
     max_tokens: int = 4096
 ) -> List[Dict[str, Any]]:
     """
-    Split a story into scenes.
+    Split a story into scenes ONLY if it exceeds max_tokens.
     
-    FAST PATH: If tokens + bio_tags already exist, split them directly (no reprocessing).
-    FALLBACK: If raw text only, run preprocessor (slow but correct).
+    STRATEGY:
+    1. Quick regex check: does story have multiple scenes?
+    2. If single scene (or no scenes): preprocess once, return as-is
+    3. If multiple scenes AND story is long: preprocess, check token count, then split
+    
+    Scene format: ### Scene N: at the start of a line
+    Preamble: Any text before "### Scene 1:" is preserved as context
     
     Args:
-        story_data: Original story with text + entities (may have tokens/bio_tags)
-        preprocessor: StoryPreprocessor instance (only used if tokens missing)
+        story_data: Original story with text + entities
+        preprocessor: StoryPreprocessor instance
         min_tokens: Minimum tokens per scene (skip shorter)
-        max_tokens: Maximum tokens per scene (for filtering)
+        max_tokens: Only split if story exceeds this (e.g., 4096)
     
     Returns:
-        List of scene dicts, each properly tagged
+        List of scene dicts (one item if under limit, multiple if split)
     """
-    # FAST PATH: If already preprocessed (tokens + bio_tags exist), split directly
+    # FAST PATH: If already preprocessed, check size
     if 'tokens' in story_data and 'bio_tags' in story_data:
-        return split_preprocessed_story(story_data, min_tokens, max_tokens)
+        token_count = len(story_data['tokens'])
+        if token_count < max_tokens:
+            return [story_data]  # No split needed
+        else:
+            return split_preprocessed_story(story_data, min_tokens, max_tokens)
     
-    # FALLBACK: Raw text, need to preprocess
+    # Get text and entities
     text = story_data.get('text', '')
-    
-    # Handle both data formats
     if 'entities' in story_data:
         entities = story_data['entities']
     elif 'characters' in story_data:
-        # Convert characters format to entities
         entities = []
         for char in story_data['characters']:
             if isinstance(char, dict):
@@ -103,16 +109,12 @@ def split_story_at_scenes(
     else:
         entities = []
     
-    # Find scene boundaries
-    scene_pattern = r'###\s*Scene\s*\d+:[^\n]*\n+'
-    scene_splits = re.split(scene_pattern, text)
+    # QUICK CHECK: Are there multiple scenes? (cheap regex split)
+    scene_pattern = r'^###\s*Scene\s*\d+:[^\n]*$'  # Anchored to start of line
+    scene_matches = list(re.finditer(scene_pattern, text, re.MULTILINE))
     
-    # Remove empty first section
-    if scene_splits and len(scene_splits[0].strip()) == 0:
-        scene_splits = scene_splits[1:]
-    
-    # If no scenes, process as single story
-    if len(scene_splits) <= 1:
+    if len(scene_matches) <= 1:
+        # Single scene (or no scenes) - process as-is, don't split
         single_story = {
             'story_id': story_data.get('story_id', 'unknown'),
             'text': text,
@@ -120,14 +122,40 @@ def split_story_at_scenes(
             'metadata': story_data.get('metadata', {})
         }
         processed = preprocessor.process_story(single_story)
-        
-        # Filter by MIN token count only
-        # Let tokenizer handle truncation at max_length during training
-        # (Don't lose data by skipping long scenes)
         token_count = len(processed['tokens'])
-        if token_count < min_tokens:
-            return []
         
+        if token_count >= min_tokens:
+            return [processed]
+        else:
+            return []
+    
+    # Multiple scenes found - preprocess to check if we actually need to split
+    single_story = {
+        'story_id': story_data.get('story_id', 'unknown'),
+        'text': text,
+        'entities': entities,
+        'metadata': story_data.get('metadata', {})
+    }
+    processed = preprocessor.process_story(single_story)
+    token_count = len(processed['tokens'])
+    
+    # If under max_tokens, don't split - return whole story
+    if token_count < max_tokens:
+        if token_count >= min_tokens:
+            return [processed]
+        else:
+            return []
+    
+    # Exceeds max_tokens and has multiple scenes - now split at boundaries
+    scene_split_pattern = r'^###\s*Scene\s*\d+:[^\n]*\n+'
+    scene_splits = re.split(scene_split_pattern, text, flags=re.MULTILINE)
+    
+    # Remove empty first section and handle preamble (story title, etc before Scene 1)
+    if scene_splits and len(scene_splits[0].strip()) == 0:
+        scene_splits = scene_splits[1:]
+    
+    if not scene_splits:
+        # Shouldn't happen, but fall back to returning whole story
         return [processed]
     
     scenes = []
@@ -137,12 +165,10 @@ def split_story_at_scenes(
         if not scene_text:
             continue
         
-        # Build mini-story for this scene
-        # Include ALL entities (preprocessor will filter to what appears)
         scene_story = {
             'story_id': f"{story_data.get('story_id', 'unknown')}_scene{scene_idx + 1}",
             'text': scene_text,
-            'entities': entities,  # Pass all entities, preprocessor filters
+            'entities': entities,
             'metadata': {
                 'genre': story_data.get('genre', 'unknown'),
                 'parent_story_id': story_data.get('story_id', 'unknown'),
@@ -151,7 +177,8 @@ def split_story_at_scenes(
             }
         }
         
-        # Process scene with preprocessor - generates fresh tokens + BIO tags
+        # Process scene with preprocessor
+        processed = preprocessor.process_story(scene_story)
         processed = preprocessor.process_story(scene_story)
         
         # Filter by MIN token count only

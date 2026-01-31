@@ -39,7 +39,6 @@ try:
     HAS_BLOOM = True
 except ImportError:
     HAS_BLOOM = False
-    print("⚠️  pybloom-live not installed - using set (slower)")
 
 try:
     import xxhash

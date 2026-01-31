@@ -35,10 +35,10 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        # spaCy tokenizes "Mr." as one token, followed by "Bennet"
-        # Mr. should be O, Bennet should be B-PERSON
-        assert processed["tokens"] == ["Mr.", "Bennet", "arrived", "at", "the", "door", "."]
-        assert processed["bio_tags"] == ["O", "B-PERSON", "O", "O", "O", "O", "O"]
+        # BlingFire splits "Mr." into "Mr" + ".", followed by "Bennet"
+        # Both "Mr" and "." should be O, Bennet should be B-PERSON
+        assert processed["tokens"] == ["Mr", ".", "Bennet", "arrived", "at", "the", "door", "."]
+        assert processed["bio_tags"] == ["O", "O", "B-PERSON", "O", "O", "O", "O", "O"]
 
     def test_title_with_surname(self, preprocessor):
         """Title + surname (Dr. Lamp) should label surname correctly."""
@@ -52,8 +52,8 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        # spaCy tokenizes "Dr." as one token
-        assert processed["bio_tags"] == ["O", "B-PERSON", "O", "O", "O", "O"]
+        # BlingFire splits "Dr." into "Dr" + "."
+        assert processed["bio_tags"] == ["O", "O", "B-PERSON", "O", "O", "O", "O"]
 
     def test_common_noun_collision_prevented(self, preprocessor):
         """Common nouns like 'the cook' should NOT be labeled when ambiguous."""
@@ -82,8 +82,9 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        # Cook should be B-PERSON because preceded by title (Mr. is one token)
-        assert processed["bio_tags"] == ["O", "B-PERSON", "O", "O", "O"]
+        # Cook should be B-PERSON because preceded by title (BlingFire splits "Mr." into "Mr" + ".")
+        # Tokens: ["Mr", ".", "Cook", "prepared", "dinner", "."]
+        assert processed["bio_tags"] == ["O", "O", "B-PERSON", "O", "O", "O"]
 
     def test_full_name_without_title(self, preprocessor):
         """Full names should work normally without titles."""
@@ -142,8 +143,9 @@ class TestContextualLabeling:
 
         processed = preprocessor.process_story(story)
 
-        # Cook should be labeled because preceded by Mr. (spaCy tokenizes Mr. as one token)
-        assert processed["bio_tags"] == ["O", "O", "O", "O", "B-PERSON", "O", "O", "O", "O"]
+        # Cook should be labeled because preceded by Mr. (BlingFire splits "Mr." into "Mr" + ".")
+        # Tokens: ["The", "man", "was", "Mr", ".", "Cook", "from", "the", "village", "."]
+        assert processed["bio_tags"] == ["O", "O", "O", "O", "O", "B-PERSON", "O", "O", "O", "O"]
 
 
 class TestNameVariantExpansion:
@@ -724,7 +726,7 @@ class TestCommonNounHandling:
         processed = preprocessor.process_story(story)
 
         # Lamp should be B-PERSON because preceded by Dr.
-        assert processed["tokens"][1] == "Lamp" and processed["bio_tags"][1] == "B-PERSON"
+        assert processed["tokens"][2] == "Lamp" and processed["bio_tags"][2] == "B-PERSON"
 
     def test_common_noun_in_full_name(self, preprocessor):
         """Common nouns in full names should be labeled."""

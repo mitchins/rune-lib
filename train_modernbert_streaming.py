@@ -238,43 +238,113 @@ def create_compute_metrics(label_list):
 
 
 def main():
-    """Main training function with ModernBERT."""
+    """Main training function with curriculum support."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Train ModernBERT NER model")
-    parser.add_argument('--input', default="ner_training_filtered_8k.jsonl", help="Input JSONL file")
-    parser.add_argument('--output', default="./story_ner_model_modernbert", help="Output directory")
-    parser.add_argument('--max-length', type=int, default=8192, help="Max token length")
+    parser = argparse.ArgumentParser(
+        description="Train NER model with optional curriculum learning",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Single-stage training
+  python3 train_modernbert_streaming.py --input data.jsonl --output ./model --model answerdotai/ModernBERT-base
+  
+  # Curriculum training (2 stages)
+  python3 train_modernbert_streaming.py \\
+    --model allenai/longformer-base-4096 \\
+    --curriculum \\
+    --curriculum-stage1-input diverse_phase1.jsonl \\
+    --curriculum-stage2-input diverse_phase2.jsonl \\
+    --curriculum-stage1-epochs 2 \\
+    --curriculum-stage2-epochs 3 \\
+    --output ./model \\
+    --batch-size 4 \\
+    --use-bf16
+"""
+    )
+    
+    # Model and data
+    parser.add_argument('--model', default="answerdotai/ModernBERT-base", help="HuggingFace model name")
+    parser.add_argument('--input', default=None, help="Input JSONL file (single-stage)")
+    parser.add_argument('--output', default="./story_ner_model", help="Output directory")
+    parser.add_argument('--max-length', type=int, default=None, help="Max token length (auto-detect from data if not set)")
+    parser.add_argument('--stage1-max-length', type=int, default=1024, help="Stage 1 max length (short examples)")
+    parser.add_argument('--stage2-max-length', type=int, default=4096, help="Stage 2 max length (long examples)")
+    
+    # Curriculum learning
+    parser.add_argument('--curriculum', action='store_true', help="Enable curriculum learning (2 stages)")
+    parser.add_argument('--curriculum-stage1-input', default=None, help="Stage 1 input (easy examples)")
+    parser.add_argument('--curriculum-stage2-input', default=None, help="Stage 2 input (hard examples)")
+    parser.add_argument('--curriculum-stage1-epochs', type=int, default=2, help="Stage 1 epochs")
+    parser.add_argument('--curriculum-stage2-epochs', type=int, default=3, help="Stage 2 epochs")
+    
+    # Training config
+    parser.add_argument('--batch-size', type=int, default=None, help="Per-device batch size (both stages if not specified separately)")
+    parser.add_argument('--stage1-batch-size', type=int, default=None, help="Stage 1 batch size (defaults to --batch-size or 8)")
+    parser.add_argument('--stage2-batch-size', type=int, default=None, help="Stage 2 batch size (defaults to --batch-size or 4)")
+    parser.add_argument('--gradient-accumulation', type=int, default=1, help="Gradient accumulation steps")
+    parser.add_argument('--learning-rate', type=float, default=5e-5, help="Learning rate")
+    parser.add_argument('--use-bf16', action='store_true', help="Use bfloat16 mixed precision")
+    
+    # Resuming
+    parser.add_argument('--resume-from-checkpoint', default=None, help="Resume from checkpoint path")
+    
+    # Labels
     parser.add_argument('--simplify-labels', action='store_true', help="Collapse role labels to B/I-PERSON")
+    
     args = parser.parse_args()
-
-    print("🚀 TRAINING RUNE NER WITH MODERNBERT")
+    
+    # Validate arguments
+    if args.curriculum:
+        if not args.curriculum_stage1_input or not args.curriculum_stage2_input:
+            parser.error("--curriculum requires --curriculum-stage1-input and --curriculum-stage2-input")
+    elif not args.input:
+        parser.error("--input required for single-stage training (or use --curriculum)")
+    
+    print("🚀 TRAINING RUNE NER")
     print("=" * 70)
-    print("🤖 Model: ModernBERT-base (8192 token context)")
-    print("💾 Memory-efficient streaming")
-    print("📊 Dataset: Synthetic stories with ground truth")
-    if args.simplify_labels:
-        print("🔄 Mode: Simplified B/I-PERSON labels (role-agnostic)")
+    print(f"🤖 Model: {args.model}")
+    print(f"💾 Max length: {args.max_length} tokens")
+    if args.curriculum:
+        print("🎓 Mode: Curriculum learning (2 stages)")
+        print(f"   Stage 1: {args.curriculum_stage1_input} ({args.curriculum_stage1_epochs} epochs)")
+        print(f"   Stage 2: {args.curriculum_stage2_input} ({args.curriculum_stage2_epochs} epochs)")
     else:
-        print("🎭 Mode: Full role-aware labels (B-PROTAGONIST, etc.)")
-    print(f"📁 Input: {args.input}")
+        print("📖 Mode: Single-stage training")
+        print(f"   Input: {args.input}")
+    if args.simplify_labels:
+        print("🔄 Labels: Simplified B/I-PERSON (role-agnostic)")
+    else:
+        print("🎭 Labels: Full role-aware (B-PROTAGONIST, etc.)")
     print(f"💾 Output: {args.output}")
+    if args.resume_from_checkpoint:
+        print(f"♻️  Resuming from: {args.resume_from_checkpoint}")
     print("=" * 70)
     print()
 
     # Configuration
-    model_name = "answerdotai/ModernBERT-base"
-    max_length = args.max_length
-    training_file = args.input
+    model_name = args.model
+    # Set max_length based on mode
+    if args.curriculum:
+        stage1_max_length = args.stage1_max_length
+        stage2_max_length = args.stage2_max_length
+        max_length = stage1_max_length  # For initial display
+    else:
+        max_length = args.max_length or 8192
+    
+    training_file = args.input if not args.curriculum else args.curriculum_stage1_input
 
     # Count total stories
     with open(training_file, "r") as f:
         total_stories = sum(1 for _ in f)
 
     print(f"📚 Total clean stories: {total_stories}")
-    print(f"   Max token length: {max_length}")
+    if args.curriculum:
+        print(f"   Stage 1 max length: {stage1_max_length} tokens")
+        print(f"   Stage 2 max length: {stage2_max_length} tokens")
+    else:
+        print(f"   Max token length: {max_length}")
     print(f"   All stories fit within token limit (pre-filtered)")
-    print(f"   Compare: Longformer had only 5,028 stories (4096 limit)")
     print()
 
     # Calculate split
@@ -289,7 +359,11 @@ def main():
 
     # Load ModernBERT tokenizer and model
     print(f"🔄 Loading ModernBERT...")
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    # Load tokenizer with add_prefix_space for Longformer
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        add_prefix_space=True  # Required for Longformer with pretokenized inputs
+    )
 
     # Configure labels based on simplify_labels flag
     if args.simplify_labels:
@@ -351,15 +425,18 @@ def main():
     output_dir = args.output
     os.makedirs(output_dir, exist_ok=True)
 
-    # Training arguments - Conservative for variable-length sequences
+    # Training arguments
+    bf16_enabled = args.use_bf16 and torch.cuda.is_available() and torch.cuda.get_device_capability()[0] >= 8
+    fp16_enabled = not bf16_enabled and torch.cuda.is_available()
+    
     training_args = TrainingArguments(
         output_dir=output_dir,
-        num_train_epochs=3,
-        per_device_train_batch_size=3,  # Conservative for uneven batch lengths
-        per_device_eval_batch_size=3,
+        num_train_epochs=3,  # Overridden per stage in curriculum mode
+        per_device_train_batch_size=args.batch_size,
+        per_device_eval_batch_size=args.batch_size,
         warmup_steps=500,
         weight_decay=0.01,
-        learning_rate=5e-5,
+        learning_rate=args.learning_rate,
         logging_dir=f"{output_dir}/logs",
         logging_steps=100,
         eval_strategy="steps",
@@ -367,15 +444,21 @@ def main():
         save_strategy="steps",
         save_steps=500,
         load_best_model_at_end=True,
-        metric_for_best_model="f1",  # Use F1 for span integrity (not entity_accuracy)
+        metric_for_best_model="f1",
         greater_is_better=True,
-        gradient_accumulation_steps=5,  # Effective batch size: 15 (3*5)
+        gradient_accumulation_steps=args.gradient_accumulation,
         report_to=None,
         save_total_limit=3,
-        fp16=True,
+        bf16=bf16_enabled,
+        fp16=fp16_enabled,
         dataloader_num_workers=0,
-        max_steps=10000,
     )
+    
+    if bf16_enabled:
+        print(f"✅ Using bfloat16 mixed precision")
+    elif fp16_enabled:
+        print(f"✅ Using float16 mixed precision")
+    print()
 
     # Data collator
     data_collator = DataCollatorForTokenClassification(
@@ -384,73 +467,267 @@ def main():
         return_tensors="pt"
     )
 
-    # Trainer
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=val_dataset,
-        tokenizer=tokenizer,
-        data_collator=data_collator,
-        compute_metrics=create_compute_metrics(list(id_to_label.values())),
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
-    )
-
-    print(f"🏋️ Starting ModernBERT training...")
-    print(f"   Max steps: {training_args.max_steps}")
-    print(f"   Effective batch size: {training_args.per_device_train_batch_size * training_args.gradient_accumulation_steps}")
-    print(f"   Evaluation every: {training_args.eval_steps} steps")
-    print("-" * 70)
-    print()
-
-    try:
-        # Train
-        trainer.train()
-
-        print(f"\n✅ Training completed!")
+    # CURRICULUM TRAINING or SINGLE-STAGE
+    if args.curriculum:
+        # Determine batch sizes per stage
+        if args.batch_size is not None:
+            # --batch-size overrides both
+            stage1_batch_size = args.batch_size
+            stage2_batch_size = args.batch_size
+        else:
+            # Use stage-specific or defaults
+            stage1_batch_size = args.stage1_batch_size or 8  # Bigger for short sequences
+            stage2_batch_size = args.stage2_batch_size or 4  # Smaller for long sequences
+        
+        # Allow override
+        if args.stage1_batch_size:
+            stage1_batch_size = args.stage1_batch_size
+        if args.stage2_batch_size:
+            stage2_batch_size = args.stage2_batch_size
+        
+        print(f"🎓 CURRICULUM LEARNING: Stage 1 (Easy)")
+        print("=" * 70)
+        print(f"📊 Stage 1 batch size: {stage1_batch_size} (short sequences, 1024 tokens)")
+        print(f"📊 Stage 2 batch size: {stage2_batch_size} (long sequences, 4096 tokens)")
         print()
-
-        # Save
-        print(f"💾 Saving model to {output_dir}...")
-        trainer.save_model()
-        tokenizer.save_pretrained(output_dir)
-
-        # Metadata
-        import json as js
-        metadata = {
-            "model": model_name,
-            "max_token_length": max_length,
-            "total_stories": total_stories,
-            "streaming": True,
-            "label_mapping": label_to_id,
-        }
-        with open(f"{output_dir}/training_metadata.json", "w") as f:
-            js.dump(metadata, f, indent=2)
-
-        # Final evaluation
-        print(f"📊 Running final evaluation...")
-        eval_results = trainer.evaluate()
+        
+        # Count examples in each stage (wc -l)
+        with open(args.curriculum_stage1_input) as f:
+            stage1_count = sum(1 for _ in f)
+        with open(args.curriculum_stage2_input) as f:
+            stage2_count = sum(1 for _ in f)
+        
+        print(f"📊 Stage 1: {stage1_count:,} examples")
+        print(f"📊 Stage 2: {stage2_count:,} examples")
+        
+        # Calculate max_steps for each stage
+        stage1_effective_batch = stage1_batch_size * args.gradient_accumulation
+        stage2_effective_batch = stage2_batch_size * args.gradient_accumulation
+        stage1_steps = (stage1_count // stage1_effective_batch) * args.curriculum_stage1_epochs
+        stage2_steps = (stage2_count // stage2_effective_batch) * args.curriculum_stage2_epochs
+        
+        print(f"📈 Stage 1: batch={stage1_batch_size}, grad_accum={args.gradient_accumulation}, effective={stage1_effective_batch}, steps={stage1_steps:,}")
+        print(f"📈 Stage 2: batch={stage2_batch_size}, grad_accum={args.gradient_accumulation}, effective={stage2_effective_batch}, steps={stage2_steps:,}")
         print()
-
-        print(f"📈 FINAL RESULTS:")
+        
+        # Stage 1: Easy examples
+        stage1_output = f"{output_dir}/stage1"
+        os.makedirs(stage1_output, exist_ok=True)
+        
+        stage1_args = TrainingArguments(
+            output_dir=stage1_output,
+            max_steps=stage1_steps,
+            per_device_train_batch_size=stage1_batch_size,
+            per_device_eval_batch_size=stage1_batch_size,
+            warmup_steps=500,
+            weight_decay=0.01,
+            learning_rate=args.learning_rate,
+            logging_dir=f"{stage1_output}/logs",
+            logging_steps=100,
+            eval_strategy="steps",
+            eval_steps=500,
+            save_strategy="steps",
+            save_steps=500,
+            load_best_model_at_end=True,
+            metric_for_best_model="f1",
+            greater_is_better=True,
+            gradient_accumulation_steps=args.gradient_accumulation,
+            report_to=None,
+            save_total_limit=3,
+            bf16=bf16_enabled,
+            fp16=fp16_enabled,
+            dataloader_num_workers=0,
+        )
+        
+        # Stage 1 datasets
+        stage1_train = ModernBERTStreamingDataset(
+            args.curriculum_stage1_input,
+            tokenizer,
+            max_length=stage1_max_length,
+            prefiltered=True,
+            simplify_labels=args.simplify_labels
+        )
+        stage1_val = ModernBERTStreamingDataset(
+            args.curriculum_stage1_input,
+            tokenizer,
+            max_length=stage1_max_length,
+            skip=int(0.95 * total_stories),
+            prefiltered=True,
+            simplify_labels=args.simplify_labels
+        )
+        
+        stage1_trainer = Trainer(
+            model=model,
+            args=stage1_args,
+            train_dataset=stage1_train,
+            eval_dataset=stage1_val,
+            tokenizer=tokenizer,
+            data_collator=data_collator,
+            compute_metrics=create_compute_metrics(list(id_to_label.values())),
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+        )
+        
+        print(f"🏋️ Stage 1 training ({args.curriculum_stage1_epochs} epochs)...")
+        if args.curriculum_stage1_epochs > 0:
+            resume_checkpoint = args.resume_from_checkpoint if args.resume_from_checkpoint and "stage1" in args.resume_from_checkpoint else None
+            stage1_trainer.train(resume_from_checkpoint=resume_checkpoint)
+            stage1_trainer.save_model()
+            tokenizer.save_pretrained(stage1_output)
+            print(f"✅ Stage 1 complete. Saved to: {stage1_output}\n")
+        else:
+            print(f"⏭️  Skipping Stage 1 (0 epochs)\n")
+        
+        # Stage 2: Hard examples (fine-tune from stage 1)
+        print(f"🎓 CURRICULUM LEARNING: Stage 2 (Hard)")
+        print("=" * 70)
+        
+        stage2_output = f"{output_dir}/stage2"
+        os.makedirs(stage2_output, exist_ok=True)
+        
+        # Load stage 1 model or resume checkpoint
+        if args.resume_from_checkpoint and "stage2" in args.resume_from_checkpoint:
+            print(f"♻️  Resuming Stage 2 from: {args.resume_from_checkpoint}")
+            model_stage2 = AutoModelForTokenClassification.from_pretrained(args.resume_from_checkpoint)
+        elif args.curriculum_stage1_epochs > 0:
+            print(f"📥 Loading Stage 1 model from: {stage1_output}")
+            model_stage2 = AutoModelForTokenClassification.from_pretrained(stage1_output)
+        else:
+            print(f"📥 Using base model (Stage 1 skipped)")
+            model_stage2 = model
+        
+        stage2_args = TrainingArguments(
+            output_dir=stage2_output,
+            max_steps=stage2_steps,
+            per_device_train_batch_size=stage2_batch_size,
+            per_device_eval_batch_size=stage2_batch_size,
+            warmup_steps=500,
+            weight_decay=0.01,
+            learning_rate=args.learning_rate,
+            logging_dir=f"{stage2_output}/logs",
+            logging_steps=100,
+            eval_strategy="steps",
+            eval_steps=500,
+            save_strategy="steps",
+            save_steps=500,
+            load_best_model_at_end=True,
+            metric_for_best_model="f1",
+            greater_is_better=True,
+            gradient_accumulation_steps=args.gradient_accumulation,
+            report_to=None,
+            save_total_limit=3,
+            bf16=bf16_enabled,
+            fp16=fp16_enabled,
+            dataloader_num_workers=0,
+        )
+        
+        # Stage 2 datasets
+        stage2_train = ModernBERTStreamingDataset(
+            args.curriculum_stage2_input,
+            tokenizer,
+            max_length=stage2_max_length,
+            prefiltered=True,
+            simplify_labels=args.simplify_labels
+        )
+        stage2_val = ModernBERTStreamingDataset(
+            args.curriculum_stage2_input,
+            tokenizer,
+            max_length=stage2_max_length,
+            skip=int(0.95 * total_stories),
+            prefiltered=True,
+            simplify_labels=args.simplify_labels
+        )
+        
+        stage2_trainer = Trainer(
+            model=model_stage2,
+            args=stage2_args,
+            train_dataset=stage2_train,
+            eval_dataset=stage2_val,
+            tokenizer=tokenizer,
+            data_collator=data_collator,
+            compute_metrics=create_compute_metrics(list(id_to_label.values())),
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+        )
+        
+        print(f"🏋️ Stage 2 training ({args.curriculum_stage2_epochs} epochs)...")
+        resume_checkpoint = args.resume_from_checkpoint if args.resume_from_checkpoint and "stage2" in args.resume_from_checkpoint else None
+        stage2_trainer.train(resume_from_checkpoint=resume_checkpoint)
+        stage2_trainer.save_model()
+        tokenizer.save_pretrained(stage2_output)
+        
+        # Final eval
+        print(f"\n📊 Final evaluation on Stage 2...")
+        eval_results = stage2_trainer.evaluate()
+        
+        print(f"\n📈 FINAL RESULTS:")
         for key, value in eval_results.items():
             if key.startswith('eval_'):
                 metric_name = key.replace('eval_', '').upper()
                 print(f"   {metric_name}: {value:.4f}")
-        print()
-
-        print(f"🎉 SUCCESS! ModernBERT training completed")
+        
+        print(f"\n🎉 CURRICULUM TRAINING COMPLETE!")
+        print(f"📁 Stage 1: {stage1_output}")
+        print(f"📁 Stage 2 (final): {stage2_output}")
+        
+        final_model_path = stage2_output
+        
+    else:
+        # SINGLE-STAGE TRAINING
+        print(f"🏋️ Single-stage training...")
+        print("=" * 70)
+        
+        trainer = Trainer(
+            model=model,
+            args=training_args,
+            train_dataset=train_dataset,
+            eval_dataset=val_dataset,
+            tokenizer=tokenizer,
+            data_collator=data_collator,
+            compute_metrics=create_compute_metrics(list(id_to_label.values())),
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+        )
+        
+        resume_checkpoint = args.resume_from_checkpoint
+        trainer.train(resume_from_checkpoint=resume_checkpoint)
+        trainer.save_model()
+        tokenizer.save_pretrained(output_dir)
+        
+        # Final eval
+        print(f"\n📊 Final evaluation...")
+        eval_results = trainer.evaluate()
+        
+        print(f"\n📈 FINAL RESULTS:")
+        for key, value in eval_results.items():
+            if key.startswith('eval_'):
+                metric_name = key.replace('eval_', '').upper()
+                print(f"   {metric_name}: {value:.4f}")
+        
+        print(f"\n🎉 TRAINING COMPLETE!")
         print(f"📁 Model saved to: {output_dir}")
-        print()
+        
+        final_model_path = output_dir
 
-        return 0
+    # Metadata
+    import json as js
+    metadata = {
+        "model": model_name,
+        "max_token_length": max_length,
+        "total_stories": total_stories,
+        "streaming": True,
+        "label_mapping": label_to_id,
+        "curriculum": args.curriculum,
+    }
+    with open(f"{final_model_path}/training_metadata.json", "w") as f:
+        js.dump(metadata, f, indent=2)
 
+    print()
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        exit(main())
     except Exception as e:
         print(f"\n❌ TRAINING FAILED: {e}")
         import traceback
         traceback.print_exc()
-        return 1
-
-
-if __name__ == "__main__":
-    exit(main())
+        exit(1)
