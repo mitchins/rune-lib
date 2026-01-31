@@ -4,6 +4,7 @@ test_model*/
 
 # Training data (too large)
 *.jsonl
+!ood_validation_ground_truth_modern_heavy.jsonl
 
 # Logs and outputs
 *.log
