@@ -25,6 +25,8 @@ python3 create_diverse_subset_v2.py \
 **Output:** 130k diverse examples split into phase1 (short) and phase2 (long)
 
 ### Step 3: Train with Curriculum Learning
+
+**Basic training (90/10 split):**
 ```bash
 python3 train_modernbert_streaming.py \
   --model allenai/longformer-base-4096 \
@@ -40,7 +42,61 @@ python3 train_modernbert_streaming.py \
   --stage1-batch-size 20 \
   --stage2-batch-size 6
 ```
+
+**With OOD validation (recommended):**
+```bash
+python3 train_modernbert_streaming.py \
+  --model allenai/longformer-base-4096 \
+  --curriculum \
+  --curriculum-stage1-input diverse_subsets/final_training.jsonl/diverse_phase1.jsonl \
+  --curriculum-stage2-input diverse_subsets/final_training.jsonl/diverse_phase2.jsonl \
+  --curriculum-stage1-epochs 2 \
+  --curriculum-stage2-epochs 3 \
+  --output ./story_ner_model_curriculum \
+  --gradient-accumulation 2 \
+  --use-bf16 \
+  --simplify-labels \
+  --stage1-batch-size 20 \
+  --stage2-batch-size 6 \
+  --eval-ood ood_validation_ground_truth_balanced.jsonl
+```
+
+**OOD-only validation (100% training data):**
+```bash
+# Add --no-test-split to use all training data
+python3 train_modernbert_streaming.py \
+  --model allenai/longformer-base-4096 \
+  --curriculum \
+  --curriculum-stage1-input diverse_subsets/final_training.jsonl/diverse_phase1.jsonl \
+  --curriculum-stage2-input diverse_subsets/final_training.jsonl/diverse_phase2.jsonl \
+  --curriculum-stage1-epochs 2 \
+  --curriculum-stage2-epochs 3 \
+  --output ./story_ner_model_curriculum \
+  --gradient-accumulation 2 \
+  --use-bf16 \
+  --simplify-labels \
+  --stage1-batch-size 20 \
+  --stage2-batch-size 6 \
+  --eval-ood ood_validation_ground_truth_balanced.jsonl \
+  --no-test-split
+```
+
 **Result:** Two-stage curriculum training (short examples → long examples)
+
+## Validation Options
+
+| Flags | Behavior |
+|-------|----------|
+| (none) | 90/10 train/val split |
+| `--eval-ood <path>` | 90/10 split + OOD holdout validation |
+| `--eval-ood <path> --no-test-split` | 100% training data, OOD validation only |
+| `--no-test-split` | 100% training data, no validation (not recommended) |
+
+**Available OOD datasets:**
+- `ood_validation_ground_truth_balanced.jsonl` (16 examples, 18% ≤1024 tokens)
+- `ood_validation_ground_truth_modern_heavy_fixed.jsonl` (24 examples, 16% ≤1024 tokens)
+
+**Note:** Stage 1 (1024 tokens) has fewer usable OOD examples (~3-4) vs Stage 2 (4096 tokens) with 11-15 examples. This is acceptable - Stage 2 validation is more critical.
 
 ---
 

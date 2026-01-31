@@ -7,8 +7,9 @@ Uses ModernBERT's 8192 token context to handle longer stories.
 import os
 import json
 import torch
-from typing import Iterator, Dict, Any
-from torch.utils.data import IterableDataset
+import argparse
+from typing import Iterator, Dict, Any, List, Tuple
+from torch.utils.data import IterableDataset, Dataset
 from transformers import (
     AutoTokenizer,
     AutoModelForTokenClassification,
@@ -237,9 +238,159 @@ def create_compute_metrics(label_list):
     return compute_metrics
 
 
+class OODValidationDataset(Dataset):
+    """Static OOD validation dataset (non-streaming)."""
+    
+    def __init__(
+        self,
+        ood_examples: List[Dict[str, Any]],
+        tokenizer,
+        max_length: int,
+        simplify_labels: bool = False
+    ):
+        """
+        Initialize OOD dataset.
+        
+        Args:
+            ood_examples: List of preprocessed OOD examples
+            tokenizer: Tokenizer
+            max_length: Max sequence length (truncate if longer)
+            simplify_labels: If True, collapse role labels
+        """
+        self.examples = ood_examples
+        self.tokenizer = tokenizer
+        self.max_length = max_length
+        self.simplify_labels = simplify_labels
+        
+        # Label mappings
+        if simplify_labels:
+            self.label_to_id = {
+                'O': 0,
+                'B-PERSON': 1,
+                'I-PERSON': 2,
+                'B-LOCATION': 3,
+                'I-LOCATION': 4,
+            }
+            self.role_to_simple = {
+                'B-PROTAGONIST': 'B-PERSON',
+                'I-PROTAGONIST': 'I-PERSON',
+                'B-ANTAGONIST': 'B-PERSON',
+                'I-ANTAGONIST': 'I-PERSON',
+                'B-SUPPORTING': 'B-PERSON',
+                'I-SUPPORTING': 'I-PERSON',
+                'B-LOCATION': 'B-LOCATION',
+                'I-LOCATION': 'I-LOCATION',
+                'O': 'O',
+            }
+        else:
+            self.label_to_id = {
+                'O': 0,
+                'B-ANTAGONIST': 1,
+                'B-PROTAGONIST': 2,
+                'B-SUPPORTING': 3,
+                'I-ANTAGONIST': 4,
+                'I-PROTAGONIST': 5,
+                'I-SUPPORTING': 6,
+            }
+            self.role_to_simple = None
+    
+    def __len__(self):
+        return len(self.examples)
+    
+    def __getitem__(self, idx):
+        """Get a single example."""
+        example = self.examples[idx]
+        tokens = example['tokens']
+        bio_tags = example['bio_tags']
+        
+        # Truncate if needed
+        if len(tokens) > self.max_length:
+            tokens = tokens[:self.max_length]
+            bio_tags = bio_tags[:self.max_length]
+        
+        # Simplify labels if needed
+        if self.simplify_labels and self.role_to_simple:
+            bio_tags = [self.role_to_simple.get(tag, tag) for tag in bio_tags]
+        
+        # Convert to IDs
+        label_ids = [self.label_to_id.get(tag, 0) for tag in bio_tags]
+        
+        # Tokenize (already tokenized, so just convert to input_ids)
+        tokenized = self.tokenizer(
+            tokens,
+            is_split_into_words=True,
+            truncation=True,
+            max_length=self.max_length,
+            padding=False
+        )
+        
+        # Align labels with subword tokens
+        word_ids = tokenized.word_ids()
+        aligned_labels = []
+        for word_id in word_ids:
+            if word_id is None:
+                aligned_labels.append(-100)
+            else:
+                aligned_labels.append(label_ids[word_id])
+        
+        return {
+            'input_ids': tokenized['input_ids'],
+            'attention_mask': tokenized['attention_mask'],
+            'labels': aligned_labels
+        }
+
+
+def load_and_preprocess_ood(
+    ood_path: str,
+    max_length: int,
+    warn_truncation: bool = True
+) -> Tuple[List[Dict[str, Any]], int, int]:
+    """
+    Load OOD validation data and preprocess it.
+    
+    Args:
+        ood_path: Path to OOD JSONL file
+        max_length: Max token length for this stage
+        warn_truncation: Whether to warn about truncated examples
+    
+    Returns:
+        Tuple of (examples, usable_count, truncated_count)
+    """
+    preprocessor = StoryPreprocessor(use_spacy=True)
+    examples = []
+    truncated = 0
+    
+    with open(ood_path) as f:
+        for line in f:
+            raw = json.loads(line)
+            
+            # Preprocess to get tokens and bio_tags
+            processed = preprocessor.process_story(
+                text=raw['text'],
+                characters=[
+                    {
+                        'name': char['name'],
+                        'role': char.get('role', 'SUPPORTING')
+                    }
+                    for char in raw.get('characters', [])
+                ],
+                story_id=raw.get('story_id', 'ood'),
+                genre=raw.get('genre', 'classic')
+            )
+            
+            if processed and 'tokens' in processed and 'bio_tags' in processed:
+                examples.append(processed)
+                if len(processed['tokens']) > max_length:
+                    truncated += 1
+    
+    if warn_truncation and truncated > 0:
+        print(f"⚠️  {truncated}/{len(examples)} OOD examples exceed {max_length} tokens (will be truncated)")
+    
+    return examples, len(examples), truncated
+
+
 def main():
     """Main training function with curriculum support."""
-    import argparse
 
     parser = argparse.ArgumentParser(
         description="Train NER model with optional curriculum learning",
@@ -292,6 +443,10 @@ Examples:
     # Labels
     parser.add_argument('--simplify-labels', action='store_true', help="Collapse role labels to B/I-PERSON")
     
+    # Validation
+    parser.add_argument('--eval-ood', default=None, help="Path to OOD validation set (e.g., ood_validation_ground_truth_balanced.jsonl)")
+    parser.add_argument('--no-test-split', action='store_true', help="Don't split data into train/val (use 100%% for training)")
+    
     args = parser.parse_args()
     
     # Validate arguments
@@ -300,6 +455,10 @@ Examples:
             parser.error("--curriculum requires --curriculum-stage1-input and --curriculum-stage2-input")
     elif not args.input:
         parser.error("--input required for single-stage training (or use --curriculum)")
+    
+    # Validate OOD flags
+    if args.no_test_split and not args.eval_ood:
+        print("⚠️  WARNING: --no-test-split without --eval-ood means NO evaluation will occur")
     
     print("🚀 TRAINING RUNE NER")
     print("=" * 70)
@@ -316,6 +475,17 @@ Examples:
         print("🔄 Labels: Simplified B/I-PERSON (role-agnostic)")
     else:
         print("🎭 Labels: Full role-aware (B-PROTAGONIST, etc.)")
+    
+    # Validation strategy
+    if args.eval_ood and args.no_test_split:
+        print("📊 Validation: OOD only (100% training data)")
+    elif args.eval_ood:
+        print("📊 Validation: 90/10 split + OOD holdout")
+    elif args.no_test_split:
+        print("📊 Validation: None (100% training data)")
+    else:
+        print("📊 Validation: 90/10 split")
+    
     print(f"💾 Output: {args.output}")
     if args.resume_from_checkpoint:
         print(f"♻️  Resuming from: {args.resume_from_checkpoint}")
@@ -347,14 +517,21 @@ Examples:
     print(f"   All stories fit within token limit (pre-filtered)")
     print()
 
-    # Calculate split
-    val_split_idx = int(0.9 * total_stories)
-    train_count = val_split_idx
-    val_count = total_stories - val_split_idx
-
-    print(f"📊 Train/Val Split:")
-    print(f"   Training: {train_count} stories")
-    print(f"   Validation: {val_count} stories")
+    # Calculate split (if needed)
+    if args.no_test_split:
+        val_split_idx = total_stories
+        train_count = total_stories
+        val_count = 0
+        print(f"📊 Train/Val Split:")
+        print(f"   Training: {train_count} stories (100%)")
+        print(f"   Validation: Using OOD holdout only" if args.eval_ood else "   Validation: None")
+    else:
+        val_split_idx = int(0.9 * total_stories)
+        train_count = val_split_idx
+        val_count = total_stories - val_split_idx
+        print(f"📊 Train/Val Split:")
+        print(f"   Training: {train_count} stories")
+        print(f"   Validation: {val_count} stories")
     print()
 
     # Load ModernBERT tokenizer and model
@@ -409,16 +586,24 @@ Examples:
         simplify_labels=args.simplify_labels
     )
 
-    val_dataset = ModernBERTStreamingDataset(
-        training_file,
-        tokenizer,
-        max_length=max_length,
-        skip=val_split_idx,
-        limit=val_count,
-        prefiltered=True,  # Data is already pre-processed
-        simplify_labels=args.simplify_labels
-    )
-    print("✅ Streaming datasets created (using pre-filtered data)")
+    # Create validation dataset (if not using OOD-only)
+    if args.no_test_split and not args.eval_ood:
+        val_dataset = None
+        print("✅ Training dataset created (no validation)")
+    elif args.no_test_split and args.eval_ood:
+        val_dataset = None  # Will be replaced with OOD below
+        print("✅ Training dataset created (OOD validation only)")
+    else:
+        val_dataset = ModernBERTStreamingDataset(
+            training_file,
+            tokenizer,
+            max_length=max_length,
+            skip=val_split_idx,
+            limit=val_count,
+            prefiltered=True,  # Data is already pre-processed
+            simplify_labels=args.simplify_labels
+        )
+        print("✅ Streaming datasets created (using pre-filtered data)")
     print()
 
     # Output directory
@@ -428,6 +613,11 @@ Examples:
     # Training arguments
     bf16_enabled = args.use_bf16 and torch.cuda.is_available() and torch.cuda.get_device_capability()[0] >= 8
     fp16_enabled = not bf16_enabled and torch.cuda.is_available()
+    
+    # Determine eval strategy based on validation
+    has_eval = args.eval_ood or not args.no_test_split
+    eval_strategy = "steps" if has_eval else "no"
+    load_best = has_eval
     
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -439,13 +629,13 @@ Examples:
         learning_rate=args.learning_rate,
         logging_dir=f"{output_dir}/logs",
         logging_steps=100,
-        eval_strategy="steps",
-        eval_steps=500,
+        eval_strategy=eval_strategy,
+        eval_steps=500 if has_eval else None,
         save_strategy="steps",
         save_steps=500,
-        load_best_model_at_end=True,
-        metric_for_best_model="f1",
-        greater_is_better=True,
+        load_best_model_at_end=load_best,
+        metric_for_best_model="f1" if has_eval else None,
+        greater_is_better=True if has_eval else None,
         gradient_accumulation_steps=args.gradient_accumulation,
         report_to=None,
         save_total_limit=3,
@@ -466,6 +656,63 @@ Examples:
         pad_to_multiple_of=8,
         return_tensors="pt"
     )
+
+    # Load OOD validation if specified
+    ood_dataset_stage1 = None
+    ood_dataset_stage2 = None
+    if args.eval_ood:
+        print(f"🔄 Loading OOD validation from: {args.eval_ood}")
+        
+        # For curriculum: load OOD for both stages
+        if args.curriculum:
+            # Stage 1 OOD (filter to stage1_max_length)
+            ood_examples_s1, s1_count, s1_trunc = load_and_preprocess_ood(
+                args.eval_ood,
+                stage1_max_length,
+                warn_truncation=True
+            )
+            ood_dataset_stage1 = OODValidationDataset(
+                ood_examples_s1,
+                tokenizer,
+                stage1_max_length,
+                simplify_labels=args.simplify_labels
+            )
+            print(f"✅ Stage 1 OOD: {s1_count} examples (max_length={stage1_max_length})")
+            if s1_trunc > 0:
+                print(f"   ⚠️  {s1_trunc} examples truncated")
+            
+            # Stage 2 OOD (filter to stage2_max_length)
+            ood_examples_s2, s2_count, s2_trunc = load_and_preprocess_ood(
+                args.eval_ood,
+                stage2_max_length,
+                warn_truncation=False  # Don't warn twice
+            )
+            ood_dataset_stage2 = OODValidationDataset(
+                ood_examples_s2,
+                tokenizer,
+                stage2_max_length,
+                simplify_labels=args.simplify_labels
+            )
+            print(f"✅ Stage 2 OOD: {s2_count} examples (max_length={stage2_max_length})")
+            if s2_trunc > 0:
+                print(f"   ⚠️  {s2_trunc} examples truncated")
+        else:
+            # Single-stage: load OOD once
+            ood_examples, ood_count, ood_trunc = load_and_preprocess_ood(
+                args.eval_ood,
+                max_length,
+                warn_truncation=True
+            )
+            ood_dataset_stage1 = OODValidationDataset(
+                ood_examples,
+                tokenizer,
+                max_length,
+                simplify_labels=args.simplify_labels
+            )
+            print(f"✅ OOD validation: {ood_count} examples (max_length={max_length})")
+            if ood_trunc > 0:
+                print(f"   ⚠️  {ood_trunc} examples truncated")
+        print()
 
     # CURRICULUM TRAINING or SINGLE-STAGE
     if args.curriculum:
@@ -524,13 +771,13 @@ Examples:
             learning_rate=args.learning_rate,
             logging_dir=f"{stage1_output}/logs",
             logging_steps=100,
-            eval_strategy="steps",
-            eval_steps=500,
+            eval_strategy=eval_strategy,
+            eval_steps=500 if has_eval else None,
             save_strategy="steps",
             save_steps=500,
-            load_best_model_at_end=True,
-            metric_for_best_model="f1",
-            greater_is_better=True,
+            load_best_model_at_end=load_best,
+            metric_for_best_model="f1" if has_eval else None,
+            greater_is_better=True if has_eval else None,
             gradient_accumulation_steps=args.gradient_accumulation,
             report_to=None,
             save_total_limit=3,
@@ -547,14 +794,21 @@ Examples:
             prefiltered=True,
             simplify_labels=args.simplify_labels
         )
-        stage1_val = ModernBERTStreamingDataset(
-            args.curriculum_stage1_input,
-            tokenizer,
-            max_length=stage1_max_length,
-            skip=int(0.95 * total_stories),
-            prefiltered=True,
-            simplify_labels=args.simplify_labels
-        )
+        
+        # Stage 1 validation: Use OOD if specified, otherwise 5% holdout
+        if args.eval_ood:
+            stage1_val = ood_dataset_stage1
+        elif not args.no_test_split:
+            stage1_val = ModernBERTStreamingDataset(
+                args.curriculum_stage1_input,
+                tokenizer,
+                max_length=stage1_max_length,
+                skip=int(0.95 * stage1_count),
+                prefiltered=True,
+                simplify_labels=args.simplify_labels
+            )
+        else:
+            stage1_val = None
         
         stage1_trainer = Trainer(
             model=model,
@@ -564,7 +818,7 @@ Examples:
             tokenizer=tokenizer,
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)] if stage1_val else [],
         )
         
         print(f"🏋️ Stage 1 training ({args.curriculum_stage1_epochs} epochs)...")
@@ -605,13 +859,13 @@ Examples:
             learning_rate=args.learning_rate,
             logging_dir=f"{stage2_output}/logs",
             logging_steps=100,
-            eval_strategy="steps",
-            eval_steps=500,
+            eval_strategy=eval_strategy,
+            eval_steps=500 if has_eval else None,
             save_strategy="steps",
             save_steps=500,
-            load_best_model_at_end=True,
-            metric_for_best_model="f1",
-            greater_is_better=True,
+            load_best_model_at_end=load_best,
+            metric_for_best_model="f1" if has_eval else None,
+            greater_is_better=True if has_eval else None,
             gradient_accumulation_steps=args.gradient_accumulation,
             report_to=None,
             save_total_limit=3,
@@ -628,14 +882,21 @@ Examples:
             prefiltered=True,
             simplify_labels=args.simplify_labels
         )
-        stage2_val = ModernBERTStreamingDataset(
-            args.curriculum_stage2_input,
-            tokenizer,
-            max_length=stage2_max_length,
-            skip=int(0.95 * total_stories),
-            prefiltered=True,
-            simplify_labels=args.simplify_labels
-        )
+        
+        # Stage 2 validation: Use OOD if specified, otherwise 5% holdout
+        if args.eval_ood:
+            stage2_val = ood_dataset_stage2
+        elif not args.no_test_split:
+            stage2_val = ModernBERTStreamingDataset(
+                args.curriculum_stage2_input,
+                tokenizer,
+                max_length=stage2_max_length,
+                skip=int(0.95 * stage2_count),
+                prefiltered=True,
+                simplify_labels=args.simplify_labels
+            )
+        else:
+            stage2_val = None
         
         stage2_trainer = Trainer(
             model=model_stage2,
@@ -645,7 +906,7 @@ Examples:
             tokenizer=tokenizer,
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)] if stage2_val else [],
         )
         
         print(f"🏋️ Stage 2 training ({args.curriculum_stage2_epochs} epochs)...")
@@ -675,15 +936,18 @@ Examples:
         print(f"🏋️ Single-stage training...")
         print("=" * 70)
         
+        # Use OOD dataset if specified and no split, otherwise use val_dataset
+        final_eval_dataset = ood_dataset_stage1 if args.eval_ood else val_dataset
+        
         trainer = Trainer(
             model=model,
             args=training_args,
             train_dataset=train_dataset,
-            eval_dataset=val_dataset,
+            eval_dataset=final_eval_dataset,
             tokenizer=tokenizer,
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)] if final_eval_dataset else [],
         )
         
         resume_checkpoint = args.resume_from_checkpoint
