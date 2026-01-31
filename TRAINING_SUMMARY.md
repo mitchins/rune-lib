@@ -58,7 +58,7 @@ python3 train_modernbert_streaming.py \
   --simplify-labels \
   --stage1-batch-size 20 \
   --stage2-batch-size 6 \
-  --eval-ood ood_validation_ground_truth_balanced.jsonl
+  --eval-ood ood_validation_ground_truth_modern_heavy.jsonl
 ```
 
 **OOD-only validation (100% training data):**
@@ -77,7 +77,7 @@ python3 train_modernbert_streaming.py \
   --simplify-labels \
   --stage1-batch-size 20 \
   --stage2-batch-size 6 \
-  --eval-ood ood_validation_ground_truth_balanced.jsonl \
+  --eval-ood ood_validation_ground_truth_modern_heavy.jsonl \
   --no-test-split
 ```
 
@@ -92,11 +92,13 @@ python3 train_modernbert_streaming.py \
 | `--eval-ood <path> --no-test-split` | 100% training data, OOD validation only |
 | `--no-test-split` | 100% training data, no validation (not recommended) |
 
-**Available OOD datasets:**
-- `ood_validation_ground_truth_balanced.jsonl` (16 examples, 18% ≤1024 tokens)
-- `ood_validation_ground_truth_modern_heavy_fixed.jsonl` (24 examples, 16% ≤1024 tokens)
+**Recommended OOD dataset:**
+- `ood_validation_ground_truth_modern_heavy.jsonl` (24 examples, 16% ≤1024 tokens) - **LATEST, fully fixed labels**
 
-**Note:** Stage 1 (1024 tokens) has fewer usable OOD examples (~3-4) vs Stage 2 (4096 tokens) with 11-15 examples. This is acceptable - Stage 2 validation is more critical.
+**Alternative (smaller):**
+- `ood_validation_ground_truth_balanced.jsonl` (16 examples, 18% ≤1024 tokens)
+
+**Note:** Stage 1 (1024 tokens) has fewer usable OOD examples (~4) vs Stage 2 (4096 tokens) with 15+ examples. This is acceptable - Stage 2 validation is more critical.
 
 ---
 
