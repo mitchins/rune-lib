@@ -68,6 +68,8 @@ class ModernBERTStreamingDataset(IterableDataset):
                 'I-PERSON': 2,
                 'B-LOCATION': 3,
                 'I-LOCATION': 4,
+                'B-AGENT': 5,
+                'I-AGENT': 6,
             }
             # Map role labels to simplified labels
             self.role_to_simple = {
@@ -79,6 +81,8 @@ class ModernBERTStreamingDataset(IterableDataset):
                 'I-SUPPORTING': 'I-PERSON',
                 'B-LOCATION': 'B-LOCATION',
                 'I-LOCATION': 'I-LOCATION',
+                'B-AGENT': 'B-AGENT',
+                'I-AGENT': 'I-AGENT',
                 'O': 'O',
             }
         else:
@@ -270,6 +274,8 @@ class OODValidationDataset(Dataset):
                 'I-PERSON': 2,
                 'B-LOCATION': 3,
                 'I-LOCATION': 4,
+                'B-AGENT': 5,
+                'I-AGENT': 6,
             }
             self.role_to_simple = {
                 'B-PROTAGONIST': 'B-PERSON',
@@ -280,6 +286,8 @@ class OODValidationDataset(Dataset):
                 'I-SUPPORTING': 'I-PERSON',
                 'B-LOCATION': 'B-LOCATION',
                 'I-LOCATION': 'I-LOCATION',
+                'B-AGENT': 'B-AGENT',
+                'I-AGENT': 'I-AGENT',
                 'O': 'O',
             }
         else:
@@ -550,6 +558,8 @@ Examples:
             'I-PERSON': 2,
             'B-LOCATION': 3,
             'I-LOCATION': 4,
+            'B-AGENT': 5,
+            'I-AGENT': 6,
         }
     else:
         label_to_id = {

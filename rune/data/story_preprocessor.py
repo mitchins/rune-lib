@@ -49,6 +49,7 @@ class StoryPreprocessor:
         self,
         tokenizer: Optional[PreTrainedTokenizer] = None,
         spacy_model: str = "en_core_web_sm",
+        extended_entity_types: bool = False,
     ):
         """
         Initialize story preprocessor.
@@ -56,8 +57,10 @@ class StoryPreprocessor:
         Args:
             tokenizer: Optional tokenizer for alignment (if None, uses lightweight spaCy blank)
             spacy_model: spaCy model for dependency parsing (REQUIRED for surname licensing)
+            extended_entity_types: If True, process LOCATION and AGENT entities in addition to PERSON
         """
         self.tokenizer = tokenizer
+        self.extended_entity_types = extended_entity_types
 
         # Initialize improved tokenizer for punctuation handling
         self.improved_tokenizer = ImprovedTokenizer()
@@ -111,15 +114,29 @@ class StoryPreprocessor:
         # STANDARD FORMAT: entities field (type=PERSON for characters)
         # Legacy fallback: characters field (deprecated)
         characters = []
+        locations = []  # Extended entity type
+        agents = []     # Extended entity type
 
         if "entities" in story_data:
-            # Standard format - filter to PERSON entities only
+            # Standard format - extract by entity type
             entities = story_data["entities"]
             for ent in entities:
-                if ent.get("type") == "PERSON":
+                ent_type = ent.get("type", "PERSON")
+                if ent_type == "PERSON":
                     characters.append({
                         "name": ent.get("text", ent.get("name", "")),
                         "role": ent.get("role", "supporting")
+                    })
+                elif ent_type == "LOCATION" and self.extended_entity_types:
+                    locations.append({
+                        "name": ent.get("text", ent.get("name", "")),
+                        "location_type": ent.get("location_type", "unknown")
+                    })
+                elif ent_type == "AGENT" and self.extended_entity_types:
+                    agents.append({
+                        "name": ent.get("text", ent.get("name", "")),
+                        "subtype": ent.get("subtype", "unknown"),
+                        "role": ent.get("role", "unknown")
                     })
         elif "characters" in story_data:
             # Legacy format (deprecated)
@@ -152,11 +169,31 @@ class StoryPreprocessor:
             for variant in variants:
                 char_to_role[variant] = role
 
+        # Build extended entity mappings (LOCATION, AGENT)
+        # These use exact string matching (no variant expansion or surname gating)
+        # CASE SENSITIVE - preserves capitalization (e.g., "DOOM Incorporated" != "doom incorporated")
+        location_names = {}  # original_name -> "LOCATION"
+        agent_names = {}     # original_name -> "AGENT"
+        
+        if self.extended_entity_types:
+            for loc in locations:
+                name = loc["name"]
+                if name:
+                    location_names[name] = "LOCATION"  # Keep original case
+            
+            for agent in agents:
+                name = agent["name"]
+                if name:
+                    agent_names[name] = "AGENT"  # Keep original case
+
         # Tokenize the text with spaCy (REQUIRED)
         tokens = self._tokenize_with_spacy(text)
 
         # Generate bio-tags
-        bio_tags = self._generate_bio_tags(tokens, char_to_role, surname_only_variants)
+        bio_tags = self._generate_bio_tags(
+            tokens, char_to_role, surname_only_variants,
+            location_names=location_names, agent_names=agent_names
+        )
 
         # Create processed story
         processed = {
@@ -455,10 +492,16 @@ class StoryPreprocessor:
         return False
 
     def _generate_bio_tags(self, tokens: List[str], char_to_role: Dict[str, str], 
-                          surname_only_variants: set = None) -> List[str]:
+                          surname_only_variants: set = None,
+                          location_names: Dict[str, str] = None,
+                          agent_names: Dict[str, str] = None) -> List[str]:
         """
-        Generate BIO tags for ALL occurrences of known character names.
-        All matched entities are tagged as PERSON (role is metadata, not NER signal).
+        Generate BIO tags for ALL occurrences of known entity names.
+        
+        Entity types:
+          - PERSON: Character names (with variant expansion and surname gating)
+          - LOCATION: Place names (exact match, case-insensitive)
+          - AGENT: AI/faction/organization names (exact match, case-insensitive)
         
         Strategy:
           - Titles (Mr., Dr., etc.) are kept as O but provide context for next token
@@ -470,6 +513,10 @@ class StoryPreprocessor:
         """
         if surname_only_variants is None:
             surname_only_variants = set()
+        if location_names is None:
+            location_names = {}
+        if agent_names is None:
+            agent_names = {}
             
         ARTICLES = {"the", "a", "an"}  # Lowercase article set
         
@@ -692,10 +739,90 @@ class StoryPreprocessor:
 
             i += window
 
+        # SECOND PASS: Match LOCATION and AGENT entities (exact string matching)
+        # Only on tokens not already tagged
+        if location_names or agent_names:
+            self._match_extended_entities(tokens, lowered, tags, location_names, agent_names)
+
         return tags
+    
+    def _match_extended_entities(
+        self, 
+        tokens: List[str], 
+        lowered: List[str], 
+        tags: List[str],
+        location_names: Dict[str, str],
+        agent_names: Dict[str, str]
+    ) -> None:
+        """
+        Match LOCATION and AGENT entities using tokenizer-based sequence matching.
+        
+        Strategy:
+        1. Tokenize canonical entity name with same tokenizer (spaCy) used for text
+        2. Try case-sensitive exact match first (higher confidence)
+        3. Fallback to case-insensitive match (for robustness)
+        4. Tag all matched tokens as single entity span (B/I/I...)
+        
+        This handles hyphenated names ("Ankh-Morpork"), apostrophes ("Wizards' Quarter"),
+        and any other punctuation correctly by matching the actual token sequence.
+        
+        Preserves original case in storage while supporting case-insensitive fallback.
+        
+        Modifies tags in-place. Only tags tokens that are currently 'O'.
+        """
+        # Combine all extended entities with their types
+        extended_entities = []
+        for name, entity_type in location_names.items():
+            extended_entities.append((name, entity_type))
+        for name, entity_type in agent_names.items():
+            extended_entities.append((name, entity_type))
+        
+        # Prepare entity data: tokenize each entity name
+        entity_data = []
+        for entity_name, entity_type in extended_entities:
+            # Tokenize the canonical entity name (preserving original case)
+            entity_tokens = self._tokenize_with_spacy(entity_name)
+            entity_tokens_lower = [t.lower() for t in entity_tokens]
+            entity_data.append((entity_tokens, entity_tokens_lower, entity_type, entity_name))
+        
+        # Sort by token count (longer first for greedy matching)
+        entity_data.sort(key=lambda x: len(x[0]), reverse=True)
+        
+        # Search for each entity's token sequence in the text
+        for entity_tokens, entity_tokens_lower, entity_type, entity_name in entity_data:
+            entity_len = len(entity_tokens)
+            
+            i = 0
+            while i <= len(tokens) - entity_len:
+                # Check all tokens in span are untagged first (skip otherwise)
+                all_untagged = all(tags[i + j] == "O" for j in range(entity_len))
+                if not all_untagged:
+                    i += 1
+                    continue
+                
+                # Try case-sensitive exact match first (higher confidence)
+                exact_match = all(
+                    tokens[i + j] == entity_tokens[j]
+                    for j in range(entity_len)
+                )
+                
+                # Fallback to case-insensitive match (for robustness)
+                case_insensitive_match = all(
+                    lowered[i + j] == entity_tokens_lower[j]
+                    for j in range(entity_len)
+                )
+                
+                if exact_match or case_insensitive_match:
+                    # Apply BIO tags to entire matched sequence
+                    tags[i] = f"B-{entity_type}"
+                    for j in range(1, entity_len):
+                        tags[i + j] = f"I-{entity_type}"
+                    i += entity_len
+                else:
+                    i += 1
 
     def _extract_entities(self, tokens: List[str], bio_tags: List[str]) -> List[Dict[str, Any]]:
-        """Extract entity information from tokens and tags. All entities are PERSON type."""
+        """Extract entity information from tokens and tags. Supports PERSON, LOCATION, and AGENT types."""
         entities = []
         current_entity = None
 
@@ -705,10 +832,13 @@ class StoryPreprocessor:
                 if current_entity:
                     entities.append(current_entity)
 
+                # Extract entity type from tag (e.g., "B-PERSON" -> "PERSON")
+                entity_label = tag[2:]  # Remove "B-" prefix
+                
                 # Start new entity
                 current_entity = {
                     "text": token,
-                    "label": "PERSON",
+                    "label": entity_label,
                     "start": i,
                     "end": i + 1,
                 }

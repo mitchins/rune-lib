@@ -119,3 +119,24 @@ class TagSchema(BaseModel):
             entity_types=["PROTAGONIST"],
             description="Schema for identifying protagonists in text"
         )
+
+    @classmethod
+    def create_extended_schema(cls, include_location: bool = True, include_agent: bool = True) -> "TagSchema":
+        """Create a schema with extended entity types (PERSON, LOCATION, AGENT).
+        
+        Args:
+            include_location: Include LOCATION entity type
+            include_agent: Include AGENT entity type (AI, factions, organizations)
+        
+        Returns:
+            TagSchema with requested entity types
+        """
+        entity_types = ["PERSON"]
+        if include_location:
+            entity_types.append("LOCATION")
+        if include_agent:
+            entity_types.append("AGENT")
+        return cls(
+            entity_types=entity_types,
+            description="Extended schema for PERSON, LOCATION, and AGENT entities"
+        )
