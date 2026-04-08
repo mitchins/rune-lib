@@ -778,11 +778,13 @@ class StoryPreprocessor:
             extended_entities.append((name, entity_type))
         
         # Prepare entity data: tokenize each entity name
+        # Use same stripping as lowered[] so apostrophe-suffix tokens match (e.g. "O'" -> "o")
+        STRIP_CHARS = ".,!?;:'\""
         entity_data = []
         for entity_name, entity_type in extended_entities:
             # Tokenize the canonical entity name (preserving original case)
             entity_tokens = self._tokenize_with_spacy(entity_name)
-            entity_tokens_lower = [t.lower() for t in entity_tokens]
+            entity_tokens_lower = [t.lower().strip(STRIP_CHARS) for t in entity_tokens]
             entity_data.append((entity_tokens, entity_tokens_lower, entity_type, entity_name))
         
         # Sort by token count (longer first for greedy matching)
@@ -791,6 +793,8 @@ class StoryPreprocessor:
         # Search for each entity's token sequence in the text
         for entity_tokens, entity_tokens_lower, entity_type, entity_name in entity_data:
             entity_len = len(entity_tokens)
+            # True if entity name canonically starts with "The" (e.g. "The Silent Choir")
+            entity_starts_with_the = entity_tokens_lower and entity_tokens_lower[0] == "the"
             
             i = 0
             while i <= len(tokens) - entity_len:
@@ -813,11 +817,25 @@ class StoryPreprocessor:
                 )
                 
                 if exact_match or case_insensitive_match:
-                    # Apply BIO tags to entire matched sequence
-                    tags[i] = f"B-{entity_type}"
-                    for j in range(1, entity_len):
-                        tags[i + j] = f"I-{entity_type}"
-                    i += entity_len
+                    # If entity starts with "The" but the token in text is lowercase "the",
+                    # the article is not part of the entity — tag only the rest of the span.
+                    # E.g. "The Silent Choir" in "...the Silent Choir..." → B-AGENT at "Silent"
+                    if (entity_starts_with_the and not exact_match
+                            and tokens[i].lower() == "the" and tokens[i] != entity_tokens[0]):
+                        # Skip the lowercase article; tag from next token if space remains
+                        if entity_len > 1 and i + 1 <= len(tokens) - (entity_len - 1):
+                            tags[i + 1] = f"B-{entity_type}"
+                            for j in range(2, entity_len):
+                                tags[i + j] = f"I-{entity_type}"
+                            i += entity_len
+                        else:
+                            i += 1
+                    else:
+                        # Apply BIO tags to entire matched sequence
+                        tags[i] = f"B-{entity_type}"
+                        for j in range(1, entity_len):
+                            tags[i + j] = f"I-{entity_type}"
+                        i += entity_len
                 else:
                     i += 1
 

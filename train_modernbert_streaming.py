@@ -34,6 +34,7 @@ class ModernBERTStreamingDataset(IterableDataset):
         limit: int = None,
         prefiltered: bool = False,
         simplify_labels: bool = False,
+        extended_entity_types: bool = False,
     ):
         """
         Initialize streaming dataset.
@@ -46,6 +47,7 @@ class ModernBERTStreamingDataset(IterableDataset):
             limit: Max stories to process
             prefiltered: If True, assumes data is pre-processed with tokens/bio_tags
             simplify_labels: If True, collapse role labels to B-PERSON/I-PERSON
+            extended_entity_types: If True, process LOCATION and AGENT entities
         """
         self.jsonl_path = jsonl_path
         self.tokenizer = tokenizer
@@ -57,7 +59,7 @@ class ModernBERTStreamingDataset(IterableDataset):
 
         # Initialize preprocessor if not prefiltered
         if not prefiltered:
-            self.preprocessor = StoryPreprocessor(use_spacy=False)
+            self.preprocessor = StoryPreprocessor(extended_entity_types=extended_entity_types)
 
         # Label mappings
         if simplify_labels:
@@ -348,10 +350,33 @@ class OODValidationDataset(Dataset):
         }
 
 
+class WeightedLossTrainer(Trainer):
+    """Trainer with class-weighted cross-entropy to handle entity/O imbalance."""
+
+    def __init__(self, *args, class_weights=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.class_weights = class_weights  # tensor, one weight per label id
+
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+        labels = inputs.pop("labels")
+        outputs = model(**inputs)
+        logits = outputs.logits  # (batch, seq_len, num_labels)
+
+        if self.class_weights is not None:
+            weights = self.class_weights.to(logits.device)
+            loss_fn = torch.nn.CrossEntropyLoss(weight=weights, ignore_index=-100)
+        else:
+            loss_fn = torch.nn.CrossEntropyLoss(ignore_index=-100)
+
+        loss = loss_fn(logits.view(-1, logits.size(-1)), labels.view(-1))
+        return (loss, outputs) if return_outputs else loss
+
+
 def load_and_preprocess_ood(
     ood_path: str,
     max_length: int,
-    warn_truncation: bool = True
+    warn_truncation: bool = True,
+    extended_entity_types: bool = False,
 ) -> Tuple[List[Dict[str, Any]], int, int]:
     """
     Load OOD validation data and preprocess it.
@@ -360,11 +385,12 @@ def load_and_preprocess_ood(
         ood_path: Path to OOD JSONL file
         max_length: Max token length for this stage
         warn_truncation: Whether to warn about truncated examples
+        extended_entity_types: If True, process LOCATION and AGENT entities
     
     Returns:
         Tuple of (examples, usable_count, truncated_count)
     """
-    preprocessor = StoryPreprocessor(use_spacy=True)
+    preprocessor = StoryPreprocessor(extended_entity_types=extended_entity_types)
     examples = []
     truncated = 0
     
@@ -372,19 +398,28 @@ def load_and_preprocess_ood(
         for line in f:
             raw = json.loads(line)
             
-            # Preprocess to get tokens and bio_tags
-            processed = preprocessor.process_story(
-                text=raw['text'],
-                characters=[
+            # Build story_data dict in standard format for process_story
+            story_data = {
+                'text': raw['text'],
+                'story_id': raw.get('story_id', 'ood'),
+                'metadata': {'genre': raw.get('genre', 'classic')},
+            }
+            
+            # Pass entities in standard format if available
+            if 'entities' in raw:
+                story_data['entities'] = raw['entities']
+            elif 'characters' in raw:
+                # Legacy format: convert characters to entities format
+                story_data['entities'] = [
                     {
-                        'name': char['name'],
-                        'role': char.get('role', 'SUPPORTING')
+                        'text': char.get('name', char.get('text', '')),
+                        'type': 'PERSON',
+                        'role': char.get('role', 'supporting'),
                     }
-                    for char in raw.get('characters', [])
-                ],
-                story_id=raw.get('story_id', 'ood'),
-                genre=raw.get('genre', 'classic')
-            )
+                    for char in raw['characters']
+                ]
+            
+            processed = preprocessor.process_story(story_data)
             
             if processed and 'tokens' in processed and 'bio_tags' in processed:
                 examples.append(processed)
@@ -450,12 +485,20 @@ Examples:
     
     # Labels
     parser.add_argument('--simplify-labels', action='store_true', help="Collapse role labels to B/I-PERSON")
+    parser.add_argument('--extended-entities', action='store_true', help="Enable LOCATION and AGENT entity types")
+    parser.add_argument('--class-weights', type=str, default=None,
+                        help="Comma-separated class weights for weighted loss (order: O,B-PERSON,I-PERSON,B-LOCATION,I-LOCATION,B-AGENT,I-AGENT). "
+                             "E.g. '1,10,10,20,20,20,20'. Auto-computed from inverse frequency if set to 'auto'.")
     
     # Validation
     parser.add_argument('--eval-ood', default=None, help="Path to OOD validation set (e.g., ood_validation_ground_truth_balanced.jsonl)")
     parser.add_argument('--no-test-split', action='store_true', help="Don't split data into train/val (use 100%% for training)")
     
     args = parser.parse_args()
+    
+    # Extended entities requires simplified labels (role-aware labels don't include LOCATION/AGENT)
+    if args.extended_entities:
+        args.simplify_labels = True
     
     # Validate arguments
     if args.curriculum:
@@ -483,6 +526,8 @@ Examples:
         print("🔄 Labels: Simplified B/I-PERSON (role-agnostic)")
     else:
         print("🎭 Labels: Full role-aware (B-PROTAGONIST, etc.)")
+    if args.extended_entities:
+        print("🌍 Extended entities: LOCATION + AGENT enabled")
     
     # Validation strategy
     if args.eval_ood and args.no_test_split:
@@ -584,6 +629,53 @@ Examples:
     print(f"   Max position embeddings: {model.config.max_position_embeddings}")
     print()
 
+    # Class weights for weighted loss
+    class_weights = None
+    if args.class_weights:
+        num_labels = len(label_to_id)
+        if args.class_weights == 'auto':
+            # Inverse-frequency weights from preprocessing summary
+            import json as _json
+            summary_path = None
+            for candidate in [
+                os.path.join(os.path.dirname(args.curriculum_stage1_input or args.input or ""), "preprocessing_summary.json"),
+                "prefiltered_extended/preprocessing_summary.json",
+            ]:
+                if os.path.exists(candidate):
+                    summary_path = candidate
+                    break
+            if summary_path:
+                with open(summary_path) as _f:
+                    summary = _json.load(_f)
+                tag_counts = summary.get("tag_counts", {})
+                total = sum(tag_counts.values()) or 1
+                weights = []
+                for lid in range(num_labels):
+                    tag = id_to_label[lid]
+                    count = tag_counts.get(tag, 1)
+                    weights.append(total / (num_labels * count))
+                # Cap weights: no label should be weighted more than 15x relative
+                # to the "O" label. Uncapped inverse-frequency can reach 100x+ which
+                # destabilises training (eval loss spikes, false-positive flooding).
+                o_weight = weights[label_to_id.get("O", 0)]
+                max_weight = max(o_weight * 15.0, 1.0)
+                weights = [min(w, max_weight) for w in weights]
+                class_weights = torch.tensor(weights, dtype=torch.float)
+                print(f"📊 Auto class weights (inverse frequency):")
+            else:
+                print("⚠️  --class-weights auto: no preprocessing_summary.json found, falling back to manual")
+                args.class_weights = None
+        if args.class_weights and args.class_weights != 'auto':
+            raw = [float(x) for x in args.class_weights.split(',')]
+            if len(raw) != num_labels:
+                raise ValueError(f"--class-weights: expected {num_labels} values, got {len(raw)}")
+            class_weights = torch.tensor(raw, dtype=torch.float)
+            print(f"📊 Manual class weights:")
+        if class_weights is not None:
+            for lid, w in enumerate(class_weights):
+                print(f"   {id_to_label[lid]:15s} (id={lid}): {w:.3f}")
+            print()
+
     # Create streaming datasets
     print("🔄 Creating streaming datasets...")
     train_dataset = ModernBERTStreamingDataset(
@@ -629,11 +721,21 @@ Examples:
     eval_strategy = "steps" if has_eval else "no"
     load_best = has_eval
     
+    # For single-stage with streaming dataset, compute max_steps
+    single_stage_epochs = 3
+    single_stage_steps = -1
+    if not args.curriculum:
+        effective_batch = (args.batch_size or 8) * args.gradient_accumulation
+        single_stage_steps = (train_count // effective_batch) * single_stage_epochs
+        print(f"📈 Single-stage: {train_count:,} examples, batch={args.batch_size or 8}, "
+              f"grad_accum={args.gradient_accumulation}, effective={effective_batch}, "
+              f"epochs={single_stage_epochs}, steps={single_stage_steps:,}")
+    
     training_args = TrainingArguments(
         output_dir=output_dir,
-        num_train_epochs=3,  # Overridden per stage in curriculum mode
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
+        max_steps=single_stage_steps,
+        per_device_train_batch_size=args.batch_size or 8,
+        per_device_eval_batch_size=args.batch_size or 8,
         warmup_steps=500,
         weight_decay=0.01,
         learning_rate=args.learning_rate,
@@ -679,7 +781,8 @@ Examples:
             ood_examples_s1, s1_count, s1_trunc = load_and_preprocess_ood(
                 args.eval_ood,
                 stage1_max_length,
-                warn_truncation=True
+                warn_truncation=True,
+                extended_entity_types=args.extended_entities,
             )
             ood_dataset_stage1 = OODValidationDataset(
                 ood_examples_s1,
@@ -695,7 +798,8 @@ Examples:
             ood_examples_s2, s2_count, s2_trunc = load_and_preprocess_ood(
                 args.eval_ood,
                 stage2_max_length,
-                warn_truncation=False  # Don't warn twice
+                warn_truncation=False,  # Don't warn twice
+                extended_entity_types=args.extended_entities,
             )
             ood_dataset_stage2 = OODValidationDataset(
                 ood_examples_s2,
@@ -711,7 +815,8 @@ Examples:
             ood_examples, ood_count, ood_trunc = load_and_preprocess_ood(
                 args.eval_ood,
                 max_length,
-                warn_truncation=True
+                warn_truncation=True,
+                extended_entity_types=args.extended_entities,
             )
             ood_dataset_stage1 = OODValidationDataset(
                 ood_examples,
@@ -820,7 +925,7 @@ Examples:
         else:
             stage1_val = None
         
-        stage1_trainer = Trainer(
+        stage1_trainer = WeightedLossTrainer(
             model=model,
             args=stage1_args,
             train_dataset=stage1_train,
@@ -829,6 +934,7 @@ Examples:
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
             callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if stage1_val else [],
+            class_weights=class_weights,
         )
         
         print(f"🏋️ Stage 1 training ({args.curriculum_stage1_epochs} epochs)...")
@@ -908,7 +1014,7 @@ Examples:
         else:
             stage2_val = None
         
-        stage2_trainer = Trainer(
+        stage2_trainer = WeightedLossTrainer(
             model=model_stage2,
             args=stage2_args,
             train_dataset=stage2_train,
@@ -917,6 +1023,7 @@ Examples:
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
             callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if stage2_val else [],
+            class_weights=class_weights,
         )
         
         print(f"🏋️ Stage 2 training ({args.curriculum_stage2_epochs} epochs)...")
@@ -949,7 +1056,7 @@ Examples:
         # Use OOD dataset if specified and no split, otherwise use val_dataset
         final_eval_dataset = ood_dataset_stage1 if args.eval_ood else val_dataset
         
-        trainer = Trainer(
+        trainer = WeightedLossTrainer(
             model=model,
             args=training_args,
             train_dataset=train_dataset,
@@ -958,6 +1065,7 @@ Examples:
             data_collator=data_collator,
             compute_metrics=create_compute_metrics(list(id_to_label.values())),
             callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if final_eval_dataset else [],
+            class_weights=class_weights,
         )
         
         resume_checkpoint = args.resume_from_checkpoint

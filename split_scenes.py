@@ -179,7 +179,6 @@ def split_story_at_scenes(
         
         # Process scene with preprocessor
         processed = preprocessor.process_story(scene_story)
-        processed = preprocessor.process_story(scene_story)
         
         # Filter by MIN token count only
         # Let tokenizer handle truncation at max_length during training
@@ -214,10 +213,15 @@ def split_preprocessed_story(
     
     # Find scene markers (### Scene N:)
     scene_indices = []
-    for i in range(len(tokens) - 2):
-        if (tokens[i] == '###' and 
-            tokens[i+1].lower() == 'scene' and 
-            (tokens[i+2].replace(':', '').isdigit() or tokens[i+2] == ':')):
+    for i in range(len(tokens) - 4):
+        # Handle both "###" as single token and "#" "#" "#" as separate tokens
+        if tokens[i] == '###':
+            if (tokens[i+1].lower() == 'scene' and 
+                (tokens[i+2].replace(':', '').isdigit() or tokens[i+2] == ':')):
+                scene_indices.append(i)
+        elif (tokens[i] == '#' and i + 4 < len(tokens) and
+              tokens[i+1] == '#' and tokens[i+2] == '#' and
+              tokens[i+3].lower() == 'scene'):
             scene_indices.append(i)
     
     # If no scene markers, just chunk by max_tokens
