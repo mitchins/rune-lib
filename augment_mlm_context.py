@@ -388,57 +388,12 @@ def _apply_fallbacks(text: str, fallback: Dict[int, str]) -> str:
     return text
 
 
-def _fill_chunk(text: str, model, tokenizer,
-                top_k: int, temperature: float, device) -> str:
-    """Fill all masks in a single chunk (fits within model max length)."""
-    inputs = tokenizer(
-        text, return_tensors="pt", truncation=True, max_length=512,
-    ).to(device)
-
-    mask_id = tokenizer.mask_token_id
-    mask_positions = (inputs.input_ids == mask_id).nonzero(as_tuple=True)[1]
-    if len(mask_positions) == 0:
-        return text
-
-    with torch.no_grad():
-        logits = model(**inputs).logits
-
-    special_ids: Set[int] = set(tokenizer.all_special_ids)
-    replacements: List[str] = []
-    for tok_pos in mask_positions:
-        scaled = logits[0, tok_pos] / max(temperature, 1e-6)
-        # Zero out special tokens so they can never be sampled
-        for sid in special_ids:
-            if sid < scaled.shape[0]:
-                scaled[sid] = float('-inf')
-        top_vals, top_ids = torch.topk(scaled, k=min(top_k, scaled.shape[-1]))
-        probs = torch.softmax(top_vals, dim=-1)
-        sampled_id = top_ids[torch.multinomial(probs, 1).item()].item()
-        word = tokenizer.decode([sampled_id]).strip()
-        replacements.append(word if word else "")
-
-    result = text
-    for replacement in replacements:
-        idx = result.find(MASK_TOKEN)
-        if idx == -1:
-            break
-        result = result[:idx] + replacement + result[idx + len(MASK_TOKEN):]
-    return result
-
-
-def _fill_in_chunks(text: str, model, tokenizer,
-                     top_k: int, temperature: float, device,
-                     chunk_size: int) -> str:
-    """
-    Split text into overlapping token-length chunks, fill masks in each.
-    Chunks are split on sentence boundaries where possible.
-    """
-    # Split into sentences (rough: split on ". " or "\n")
+def _split_into_chunks(text: str, tokenizer, chunk_size: int) -> List[str]:
+    """Split text on sentence boundaries so each chunk fits within chunk_size tokens."""
     sentences = re.split(r"(?<=[.!?])\s+|\n", text)
     chunks: List[str] = []
     current: List[str] = []
     current_len = 0
-
     for sent in sentences:
         sent_len = len(tokenizer.encode(sent, add_special_tokens=False))
         if current_len + sent_len > chunk_size and current:
@@ -448,13 +403,81 @@ def _fill_in_chunks(text: str, model, tokenizer,
         else:
             current.append(sent)
             current_len += sent_len
-
     if current:
         chunks.append(" ".join(current))
+    return chunks if chunks else [text]
 
-    filled_chunks = [_fill_chunk(c, model, tokenizer, top_k, temperature, device)
-                     for c in chunks]
-    return " ".join(filled_chunks)
+
+def _decode_masks(text: str, logits_seq: torch.Tensor, mask_positions: torch.Tensor,
+                  top_k: int, temperature: float,
+                  special_ids: Set[int], tokenizer) -> str:
+    """Replace <mask> tokens in text using sampled predictions from logits_seq."""
+    result = text
+    for tok_pos in mask_positions:
+        scaled = logits_seq[tok_pos].clone() / max(temperature, 1e-6)
+        for sid in special_ids:
+            if sid < scaled.shape[0]:
+                scaled[sid] = float('-inf')
+        top_vals, top_ids = torch.topk(scaled, k=min(top_k, scaled.shape[-1]))
+        probs = torch.softmax(top_vals, dim=-1)
+        sampled_id = top_ids[torch.multinomial(probs, 1).item()].item()
+        word = tokenizer.decode([sampled_id]).strip()
+        idx = result.find(MASK_TOKEN)
+        if idx == -1:
+            break
+        result = result[:idx] + (word if word else "") + result[idx + len(MASK_TOKEN):]
+    return result
+
+
+def _fill_texts_batched(texts: List[str], model, tokenizer,
+                         top_k: int, temperature: float, device,
+                         batch_size: int = 64) -> List[str]:
+    """
+    Fill <mask> tokens for a list of texts using batched GPU inference.
+    All texts are padded to the longest in each mini-batch — one forward pass
+    per batch_size texts instead of one per text.
+    Returns filled texts in the same order as input.
+    """
+    special_ids: Set[int] = set(tokenizer.all_special_ids)
+    mask_id = tokenizer.mask_token_id
+    results = list(texts)
+
+    for batch_start in range(0, len(texts), batch_size):
+        batch = texts[batch_start: batch_start + batch_size]
+        inputs = tokenizer(
+            batch, return_tensors="pt",
+            truncation=True, max_length=512, padding=True,
+        ).to(device)
+
+        with torch.no_grad():
+            logits = model(**inputs).logits  # [B, seq_len, vocab]
+
+        for bi, text in enumerate(batch):
+            mask_positions = (inputs.input_ids[bi] == mask_id).nonzero(as_tuple=True)[0]
+            if len(mask_positions) == 0:
+                continue
+            results[batch_start + bi] = _decode_masks(
+                text, logits[bi], mask_positions,
+                top_k, temperature, special_ids, tokenizer,
+            )
+
+    return results
+
+
+# Legacy single-text wrappers — used by eval harness and augment_story
+def _fill_chunk(text: str, model, tokenizer,
+                top_k: int, temperature: float, device) -> str:
+    return _fill_texts_batched([text], model, tokenizer,
+                                top_k, temperature, device, batch_size=1)[0]
+
+
+def _fill_in_chunks(text: str, model, tokenizer,
+                     top_k: int, temperature: float, device,
+                     chunk_size: int) -> str:
+    chunks = _split_into_chunks(text, tokenizer, chunk_size)
+    filled = _fill_texts_batched(chunks, model, tokenizer,
+                                  top_k, temperature, device, batch_size=len(chunks))
+    return " ".join(filled)
 
 
 # ---------------------------------------------------------------------------
@@ -507,6 +530,128 @@ def augment_story(story: Dict[str, Any], model, tokenizer,
     return results
 
 
+def augment_stories_batched(
+    stories: List[Dict[str, Any]],
+    model, tokenizer,
+    window: int, peak: float, base: float,
+    top_k: int, temperature: float,
+    n_copies: int, device, rng: random.Random,
+    gpu_batch_size: int = 64,
+    chunk_size: int = 480,
+    max_retries: int = 2,
+) -> List[List[Dict[str, Any]]]:
+    """
+    Process a list of stories in one batched GPU pass per gpu_batch_size texts.
+
+    Returns a list (one per input story) of lists of augmented story dicts.
+    The masking step (CPU) runs for all stories first, then all masked texts
+    are pushed through the model together — maximising GPU utilisation.
+    """
+    # ---- Phase 1: CPU masking for every story × copy ----
+    # job_meta[i] = (story_idx, copy_idx, fallback_map, protected, n_masks, original_text)
+    # flat_texts[i] = masked text for that job
+    job_meta: List[tuple] = []
+    flat_texts: List[str] = []
+    # also track which jobs need chunking: chunk_map[(si,ci)] = (start_in_flat, n_chunks)
+    chunk_map: Dict[tuple, tuple] = {}
+
+    for si, story in enumerate(stories):
+        text     = story.get("text", "")
+        entities = story.get("entities", [])
+        char_ents = [{"text": c["name"]} for c in story.get("characters", []) if c.get("name")]
+        all_ents  = entities + char_ents
+        protected = expand_protected_strings(all_ents)
+
+        for ci in range(n_copies):
+            masked, n_masks = mask_text(text, all_ents, window, peak, base, rng)
+            fallback = _build_fallback_map(masked, text)
+            if n_masks == 0:
+                # No masks: record as identity, no GPU work needed
+                job_meta.append((si, ci, fallback, protected, 0, text))
+                flat_texts.append(masked)   # will not be batched (n_masks==0)
+                chunk_map[(si, ci)] = (len(flat_texts) - 1, 1)
+            else:
+                toks = tokenizer.encode(masked, add_special_tokens=False)
+                if len(toks) <= chunk_size:
+                    start = len(flat_texts)
+                    flat_texts.append(masked)
+                    chunk_map[(si, ci)] = (start, 1)
+                    job_meta.append((si, ci, fallback, protected, n_masks, text))
+                else:
+                    chunks = _split_into_chunks(masked, tokenizer, chunk_size)
+                    start = len(flat_texts)
+                    flat_texts.extend(chunks)
+                    chunk_map[(si, ci)] = (start, len(chunks))
+                    job_meta.append((si, ci, fallback, protected, n_masks, text))
+
+    # ---- Phase 2: Batch GPU fill (skip identity texts) ----
+    need_fill = [i for i, jm in enumerate(job_meta) if jm[4] > 0]
+    # Build a flat list of texts that actually need filling
+    fill_slots: List[int] = []   # index into flat_texts
+    for job_i in need_fill:
+        si, ci, _, _, _, _ = job_meta[job_i]
+        start, n = chunk_map[(si, ci)]
+        fill_slots.extend(range(start, start + n))
+
+    if fill_slots:
+        texts_to_fill = [flat_texts[i] for i in fill_slots]
+        filled = _fill_texts_batched(
+            texts_to_fill, model, tokenizer, top_k, temperature, device, gpu_batch_size
+        )
+        for slot_idx, flat_idx in enumerate(fill_slots):
+            flat_texts[flat_idx] = filled[slot_idx]
+
+    # ---- Phase 3: Reassemble, apply fallbacks, validate ----
+    # per_story_results[(si, ci)] = filled_text or None
+    per_job_filled: Dict[tuple, str] = {}
+    for si, ci, fallback, protected, n_masks, orig_text in job_meta:
+        start, n = chunk_map[(si, ci)]
+        chunks = flat_texts[start: start + n]
+        filled_text = " ".join(chunks) if n > 1 else chunks[0]
+        filled_text = _apply_fallbacks(filled_text, fallback)
+        ok, _ = validate_augmented(orig_text, filled_text, protected)
+        per_job_filled[(si, ci)] = filled_text if ok else None
+
+    # ---- Phase 4: Handle validation failures with single-story retry ----
+    retry_keys = [(si, ci) for (si, ci), v in per_job_filled.items() if v is None]
+    for si, ci in retry_keys:
+        story = stories[si]
+        text  = story.get("text", "")
+        entities = story.get("entities", [])
+        char_ents = [{"text": c["name"]} for c in story.get("characters", []) if c.get("name")]
+        all_ents  = entities + char_ents
+        protected = expand_protected_strings(all_ents)
+        for _ in range(max_retries):
+            masked, n_masks = mask_text(text, all_ents, window, peak, base, rng)
+            if n_masks == 0:
+                per_job_filled[(si, ci)] = text
+                break
+            filled = fill_masks(masked, text, model, tokenizer, top_k, temperature, device)
+            ok, _ = validate_augmented(text, filled, protected)
+            if ok:
+                per_job_filled[(si, ci)] = filled
+                break
+
+    # ---- Phase 5: Build output ----
+    results: List[List[Dict]] = []
+    for si, story in enumerate(stories):
+        story_results = []
+        for ci in range(n_copies):
+            filled_text = per_job_filled.get((si, ci))
+            if not filled_text or filled_text == story.get("text", ""):
+                story_results.append(story)
+                continue
+            _, _, _, _, n_masks, _ = next(
+                jm for jm in job_meta if jm[0] == si and jm[1] == ci
+            )
+            aug = dict(story)
+            aug["text"] = filled_text
+            aug["augmentation"] = {"mlm_masks": n_masks, "window": window}
+            story_results.append(aug)
+        results.append(story_results)
+    return results
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -525,6 +670,8 @@ def main():
     parser.add_argument("--max-stories", type=int,   default=None,  help="Cap stories processed (for testing)")
     parser.add_argument("--seed",        type=int,   default=42,    help="Random seed")
     parser.add_argument("--include-original", action="store_true",  help="Include original story alongside augmented copies")
+    parser.add_argument("--batch-size",  type=int,   default=64,
+                        help="Stories per GPU batch (higher = more GPU utilisation, default: 64)")
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
@@ -546,46 +693,58 @@ def main():
     print(f"\n📂 Input:  {in_path}")
     print(f"📂 Output: {out_path}")
     print(f"⚙️  window={args.window}  peak={args.peak_prob}  base={args.base_prob}  "
-          f"top_k={args.top_k}  temp={args.temperature}  copies={args.copies}")
+          f"top_k={args.top_k}  temp={args.temperature}  copies={args.copies}  "
+          f"batch_size={args.batch_size}")
     print()
 
+    story_buffer: List[Dict] = []
+
+    def flush(fout):
+        nonlocal total_in, total_out, total_masks
+        if not story_buffer:
+            return
+        batch_results = augment_stories_batched(
+            story_buffer, model, tokenizer,
+            args.window, args.peak_prob, args.base_prob,
+            args.top_k, args.temperature,
+            args.copies, device, rng,
+            gpu_batch_size=args.batch_size,
+        )
+        for story, story_aug_list in zip(story_buffer, batch_results):
+            if args.include_original:
+                fout.write(json.dumps(story, ensure_ascii=False) + "\n")
+                total_out += 1
+            for aug in story_aug_list:
+                fout.write(json.dumps(aug, ensure_ascii=False) + "\n")
+                total_out += 1
+                total_masks += aug.get("augmentation", {}).get("mlm_masks", 0)
+        total_in += len(story_buffer)
+        story_buffer.clear()
+
     with open(in_path) as fin, open(out_path, "w") as fout:
-        for lineno, line in enumerate(fin):
-            if args.max_stories and total_in >= args.max_stories:
+        for line in fin:
+            if args.max_stories and total_in + len(story_buffer) >= args.max_stories:
                 break
             line = line.strip()
             if not line:
                 continue
-
             try:
                 story = json.loads(line)
             except json.JSONDecodeError:
                 skipped += 1
                 continue
 
-            # Write original if requested
-            if args.include_original:
-                fout.write(json.dumps(story, ensure_ascii=False) + "\n")
-                total_out += 1
+            story_buffer.append(story)
 
-            augmented = augment_story(
-                story, model, tokenizer,
-                args.window, args.peak_prob, args.base_prob,
-                args.top_k, args.temperature,
-                args.copies, device, rng,
-            )
-            for aug in augmented:
-                fout.write(json.dumps(aug, ensure_ascii=False) + "\n")
-                total_out += 1
-                total_masks += aug.get("augmentation", {}).get("mlm_masks", 0)
-
-            total_in += 1
-            if total_in % 500 == 0:
+            if len(story_buffer) >= args.batch_size:
+                flush(fout)
                 avg_masks = total_masks / max(total_out, 1)
-                print(f"  {total_in:,} stories → {total_out:,} augmented  "
+                print(f"  {total_in:,} stories → {total_out:,} docs  "
                       f"(avg {avg_masks:.1f} masks/story)", end="\r", flush=True)
 
-    print(f"\n✅ Done: {total_in:,} input → {total_out:,} output stories")
+        flush(fout)  # final partial batch
+
+    print(f"\n✅ Done: {total_in:,} input → {total_out:,} output docs")
     print(f"   Total masks filled: {total_masks:,}  (avg {total_masks/max(total_out,1):.1f}/story)")
     if skipped:
         print(f"   Skipped (parse errors): {skipped}")
