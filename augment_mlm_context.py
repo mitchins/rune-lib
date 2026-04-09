@@ -9,6 +9,18 @@ Produces n-gram diversity around entity spans by:
   3. Infilling with roberta-base (one forward pass, top-k sampling per mask)
   4. Writing augmented raw-text JSONL — same entities list, new surrounding text
 
+Protection policy (what is NEVER masked):
+  - Entity spans (full strings from entities/characters fields)
+  - All title-cased sub-spans of multi-word entities (e.g. "Odeceixe" from
+    "Odeceixe River Beach") — prevents partial-name leakage
+  - Structural spans: markdown headers, Scene/Chapter/Part labels
+  - Articles (the/a/an) immediately preceding an entity span
+  - Words within 3 positions of a sensory verb (saw/heard/felt/smelled/tasted…)
+    to avoid cross-modal substitutions like "color" → "sound"
+
+Post-fill validation: any augmented copy that drops a protected entity string
+is silently discarded (falls back to original story).
+
 Output is raw JSONL suitable for preprocess_extended_training.py.
 
 Usage:
@@ -24,25 +36,142 @@ import random
 import argparse
 import sys
 from pathlib import Path
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Optional, Set
 
 import torch
 from transformers import AutoTokenizer, AutoModelForMaskedLM
+
+# ---------------------------------------------------------------------------
+# Fix 1 – Subspan / alias expansion
+# ---------------------------------------------------------------------------
+
+_COMMON_WORDS: Set[str] = {
+    "The", "A", "An", "Of", "In", "On", "At", "To", "For", "By", "With",
+    "And", "Or", "But", "Not", "Is", "Was", "Are", "Were", "Be", "Been",
+    "Has", "Had", "Have", "Do", "Did", "Does", "Up", "Down", "Out", "From",
+    "Into", "Over", "Under", "Again", "New", "Old", "High", "Low",
+    "My", "His", "Her", "Its", "Our", "Your", "Their",
+    "River", "Sea", "Lake", "Mountain", "City", "Town", "Street", "Road",
+    "Beach", "Forest", "Valley", "Hill", "Plains", "Desert", "Island",
+    "North", "South", "East", "West", "Central", "Upper", "Lower",
+    "Lord", "Lady", "King", "Queen", "Prince", "Princess", "Sir", "Master",
+}
+
+
+def expand_protected_strings(entities: List[Dict]) -> List[str]:
+    """
+    For every entity, return the full string PLUS any proper-noun sub-spans
+    that are sufficiently distinctive (not common English words, ≥ 5 chars for
+    single words so that generic nouns like 'Beach' don't carpet-protect the
+    whole document via the proximity gradient).
+
+    Multi-word sub-spans are allowed at ≥ 3 chars because phrase rarity is
+    higher than single-word rarity.
+    """
+    all_strings: Set[str] = set()
+    for ent in entities:
+        name = (ent.get("text") or ent.get("name", "")).strip()
+        if not name or len(name) < 2:
+            continue
+        all_strings.add(name)
+        words = name.split()
+        if len(words) <= 1:
+            continue
+        for start in range(len(words)):
+            for end in range(start + 1, len(words) + 1):
+                if start == 0 and end == len(words):
+                    continue  # already added full span
+                sub = " ".join(words[start:end])
+                if not sub[0].isupper():
+                    continue
+                sub_words = words[start:end]
+                if len(sub_words) == 1:
+                    # Single-word sub-span: require ≥5 chars AND not a common word
+                    if len(sub) >= 5 and sub not in _COMMON_WORDS:
+                        all_strings.add(sub)
+                else:
+                    # Multi-word sub-span: ≥3 chars total, first word not a bare article
+                    if len(sub) >= 3 and sub_words[0] not in {"The", "A", "An"}:
+                        all_strings.add(sub)
+    return list(all_strings)
+
+
+# ---------------------------------------------------------------------------
+# Fix 2 – Structural span protection
+# ---------------------------------------------------------------------------
+
+_STRUCTURAL_RE = re.compile(
+    r"(?m)^(?:"
+    r"#{1,6}\s+[^\n]+"          # ## Markdown headers
+    r"|Scene\s+\d+[^\n]*"       # Scene 1: The Dark Hour
+    r"|Chapter\s+\w+[^\n]*"     # Chapter One / Chapter 12
+    r"|Part\s+[IVXivx\d]+[^\n]*"# Part II / Part 3
+    r"|\*{3,}[^\n]*"            # *** separators
+    r"|---[^\n]*"               # --- separators
+    r")",
+)
+
+def find_structural_char_spans(text: str) -> List[Tuple[int, int]]:
+    """Return character spans of structural markers (headers, scene labels, etc.)."""
+    return [(m.start(), m.end()) for m in _STRUCTURAL_RE.finditer(text)]
+
+
+# ---------------------------------------------------------------------------
+# Fix 3 – Sensory verb no-fly zone
+# ---------------------------------------------------------------------------
+
+_SENSORY_VERBS: Set[str] = {
+    "saw", "see", "sees", "seen",
+    "watched", "watch", "watches",
+    "looked", "look", "looks",
+    "heard", "hear", "hears",
+    "felt", "feel", "feels",
+    "smelled", "smell", "smells", "smelt",
+    "tasted", "taste", "tastes",
+    "noticed", "notice", "notices",
+    "glimpsed", "glimpse",
+    "spotted", "spot",
+    "sensed", "sense",
+    "observed", "observe",
+}
+
+def sensory_neighbor_word_indices(word_spans: List[Tuple[int, int]],
+                                   text: str,
+                                   sensory_range: int = 3) -> Set[int]:
+    """
+    Return word indices that are within sensory_range positions of a sensory verb.
+    These words get their mask probability capped at base rate to avoid
+    cross-modal substitutions (e.g. "color" → "sound" near "eyes").
+    """
+    neighbors: Set[int] = set()
+    for i, (ws, we) in enumerate(word_spans):
+        word = text[ws:we].lower().rstrip(".,;:!?\"'")
+        if word in _SENSORY_VERBS:
+            lo = max(0, i - sensory_range)
+            hi = min(len(word_spans), i + sensory_range + 1)
+            for j in range(lo, hi):
+                if j != i:
+                    neighbors.add(j)
+    return neighbors
+
 
 # ---------------------------------------------------------------------------
 # Span utilities
 # ---------------------------------------------------------------------------
 
 def find_entity_char_spans(text: str, entities: List[Dict]) -> List[Tuple[int, int]]:
-    """Return character (start, end) for every entity occurrence in text."""
+    """
+    Return merged character (start, end) spans for all entity occurrences
+    (full names AND title-cased sub-spans).
+
+    NOTE: Structural spans are handled separately in mask_text — they are
+    protected from masking but do NOT radiate masking probability outward.
+    """
+    protected = expand_protected_strings(entities)
     spans = []
-    for ent in entities:
-        name = ent.get("text") or ent.get("name", "")
-        if not name or len(name) < 2:
-            continue
+    for name in protected:
         for m in re.finditer(re.escape(name), text, re.IGNORECASE):
             spans.append((m.start(), m.end()))
-    # Merge overlapping spans
     spans.sort()
     merged = []
     for s, e in spans:
@@ -56,6 +185,23 @@ def find_entity_char_spans(text: str, entities: List[Dict]) -> List[Tuple[int, i
 def get_word_spans(text: str) -> List[Tuple[int, int]]:
     """Return (start, end) for every whitespace-separated word token."""
     return [(m.start(), m.end()) for m in re.finditer(r"\S+", text)]
+
+
+# ---------------------------------------------------------------------------
+# Fix 4 – Post-fill validation
+# ---------------------------------------------------------------------------
+
+def validate_augmented(orig_text: str, aug_text: str,
+                        protected_strings: List[str]) -> Tuple[bool, str]:
+    """
+    Hard check: every protected string that appeared in orig_text must still
+    appear in aug_text.  Returns (ok, reason).
+    """
+    for s in protected_strings:
+        if re.search(re.escape(s), orig_text, re.IGNORECASE):
+            if not re.search(re.escape(s), aug_text, re.IGNORECASE):
+                return False, f"lost protected string: '{s}'"
+    return True, ""
 
 
 def word_distance_to_entity(word_spans: List[Tuple[int, int]],
@@ -121,17 +267,37 @@ def mask_text(text: str, entities: List[Dict],
     """
     Insert <mask> in-place for sampled non-entity word positions.
     Returns (masked_text, n_masks).
-    Works on character positions — entity text is never touched.
-    Articles (the/a/an) directly preceding an entity span are protected:
-    they're structural glue that helps the fill-mask model understand context.
+
+    Protection layers applied in order:
+      1. Entity spans (full + sub-spans via find_entity_char_spans)
+      2. Structural spans (headers, scene labels — inside find_entity_char_spans)
+      3. Articles directly preceding an entity span
+      4. Words within 3 positions of a sensory verb (capped at base rate)
     """
-    entity_spans = find_entity_char_spans(text, entities)
-    word_spans   = get_word_spans(text)
+    entity_spans     = find_entity_char_spans(text, entities)
+    structural_spans = find_structural_char_spans(text)
+    word_spans       = get_word_spans(text)
     if not word_spans:
         return text, 0
 
     distances, in_entity = word_distance_to_entity(word_spans, entity_spans)
     probs = mask_probabilities(distances, in_entity, window, peak, base)
+
+    # Fix 2: zero out structural tokens (headers, scene labels) independently
+    # of the proximity gradient — they're protected but don't radiate outward.
+    for i, (ws, we) in enumerate(word_spans):
+        if probs[i] == 0.0:
+            continue
+        for ss, se in structural_spans:
+            if ws < se and we > ss:   # word overlaps structural span
+                probs[i] = 0.0
+                break
+
+    # Fix 3: cap masking probability near sensory verbs to background rate
+    sensory_nbrs = sensory_neighbor_word_indices(word_spans, text)
+    for i in sensory_nbrs:
+        if probs[i] > base:
+            probs[i] = base
 
     # Protect articles at distance=1 that immediately precede an entity span.
     # Strip both leading AND trailing punctuation so '"The' / '"a' are caught.
@@ -293,25 +459,43 @@ def _fill_in_chunks(text: str, model, tokenizer,
 def augment_story(story: Dict[str, Any], model, tokenizer,
                   window: int, peak: float, base: float,
                   top_k: int, temperature: float,
-                  n_copies: int, device, rng: random.Random) -> List[Dict]:
+                  n_copies: int, device, rng: random.Random,
+                  max_retries: int = 2) -> List[Dict]:
     """
     Produce n_copies augmented versions of a story.
     Returns list of augmented story dicts with same entities, new text.
+
+    Fix 4: any copy that fails post-fill validation (drops a protected entity
+    string) is retried up to max_retries times, then falls back to original.
     """
-    text     = story.get("text", "")
-    entities = story.get("entities", [])
+    text      = story.get("text", "")
+    entities  = story.get("entities", [])
     char_ents = [{"text": c["name"]} for c in story.get("characters", []) if c.get("name")]
     all_ents  = entities + char_ents
+    protected = expand_protected_strings(all_ents)
 
     results = []
     for _ in range(n_copies):
-        masked, n_masks = mask_text(text, all_ents, window, peak, base, rng)
-        if n_masks == 0:
+        aug_text = None
+        n_masks  = 0
+        for attempt in range(max_retries + 1):
+            masked, n_masks = mask_text(text, all_ents, window, peak, base, rng)
+            if n_masks == 0:
+                aug_text = text
+                break
+            filled = fill_masks(masked, text, model, tokenizer, top_k, temperature, device)
+            ok, reason = validate_augmented(text, filled, protected)
+            if ok:
+                aug_text = filled
+                break
+            # validation failed — retry with fresh mask sampling
+
+        if aug_text is None or aug_text == text:
             results.append(story)
             continue
-        filled = fill_masks(masked, text, model, tokenizer, top_k, temperature, device)
+
         aug = dict(story)
-        aug["text"] = filled
+        aug["text"] = aug_text
         aug["augmentation"] = {"mlm_masks": n_masks, "window": window}
         results.append(aug)
 
