@@ -403,9 +403,14 @@ def _fill_chunk(text: str, model, tokenizer,
     with torch.no_grad():
         logits = model(**inputs).logits
 
+    special_ids: Set[int] = set(tokenizer.all_special_ids)
     replacements: List[str] = []
     for tok_pos in mask_positions:
         scaled = logits[0, tok_pos] / max(temperature, 1e-6)
+        # Zero out special tokens so they can never be sampled
+        for sid in special_ids:
+            if sid < scaled.shape[0]:
+                scaled[sid] = float('-inf')
         top_vals, top_ids = torch.topk(scaled, k=min(top_k, scaled.shape[-1]))
         probs = torch.softmax(top_vals, dim=-1)
         sampled_id = top_ids[torch.multinomial(probs, 1).item()].item()
