@@ -133,11 +133,13 @@ def mask_text(text: str, entities: List[Dict],
     distances, in_entity = word_distance_to_entity(word_spans, entity_spans)
     probs = mask_probabilities(distances, in_entity, window, peak, base)
 
-    # Protect articles at distance=1 that immediately precede an entity span
+    # Protect articles at distance=1 that immediately precede an entity span.
+    # Strip both leading AND trailing punctuation so '"The' / '"a' are caught.
+    _STRIP_PUNCT = str.maketrans("", "", '\"\'"\u2018\u2019\u201c\u201d.,!?;:()-')
     for i, (ws, we) in enumerate(word_spans):
         if (not in_entity[i]
                 and distances[i] == 1.0
-                and text[ws:we].lower().rstrip(".,") in _ARTICLES):
+                and text[ws:we].lower().translate(_STRIP_PUNCT) in _ARTICLES):
             next_i = i + 1
             if next_i < len(word_spans) and in_entity[next_i]:
                 probs[i] = 0.0
