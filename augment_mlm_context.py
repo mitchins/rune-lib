@@ -40,6 +40,8 @@ from typing import List, Tuple, Dict, Any, Optional, Set
 
 import torch
 from transformers import AutoTokenizer, AutoModelForMaskedLM
+import transformers
+transformers.logging.set_verbosity_error()
 
 # ---------------------------------------------------------------------------
 # Fix 1 – Subspan / alias expansion
@@ -388,23 +390,44 @@ def _apply_fallbacks(text: str, fallback: Dict[int, str]) -> str:
     return text
 
 
+_PARA_SPLIT_RE = re.compile(r'\n(?=#{1,6}\s)|\n\n+')
+
+
 def _split_into_chunks(text: str, tokenizer, chunk_size: int) -> List[str]:
-    """Split text on sentence boundaries so each chunk fits within chunk_size tokens."""
-    sentences = re.split(r"(?<=[.!?])\s+|\n", text)
+    """
+    Split text into chunks that each fit within chunk_size tokens.
+
+    Priority order:
+      1. Scene/paragraph boundaries (blank lines, markdown headers) — these
+         are natural semantic units; mean ~79 tokens, max ~360 in our data,
+         so the vast majority need no further splitting.
+      2. Sentence boundaries — fallback for any paragraph that still exceeds
+         chunk_size after step 1.
+    """
+    paragraphs = [p.strip() for p in _PARA_SPLIT_RE.split(text) if p.strip()]
+
     chunks: List[str] = []
-    current: List[str] = []
-    current_len = 0
-    for sent in sentences:
-        sent_len = len(tokenizer.encode(sent, add_special_tokens=False))
-        if current_len + sent_len > chunk_size and current:
-            chunks.append(" ".join(current))
-            current = [sent]
-            current_len = sent_len
+    for para in paragraphs:
+        para_len = len(tokenizer.encode(para, add_special_tokens=False))
+        if para_len <= chunk_size:
+            chunks.append(para)
         else:
-            current.append(sent)
-            current_len += sent_len
-    if current:
-        chunks.append(" ".join(current))
+            # Rare fallback: split the oversized paragraph on sentence boundaries
+            sentences = re.split(r"(?<=[.!?])\s+|\n", para)
+            current: List[str] = []
+            current_len = 0
+            for sent in sentences:
+                sent_len = len(tokenizer.encode(sent, add_special_tokens=False))
+                if current_len + sent_len > chunk_size and current:
+                    chunks.append(" ".join(current))
+                    current = [sent]
+                    current_len = sent_len
+                else:
+                    current.append(sent)
+                    current_len += sent_len
+            if current:
+                chunks.append(" ".join(current))
+
     return chunks if chunks else [text]
 
 
