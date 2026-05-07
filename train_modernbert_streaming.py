@@ -5,11 +5,15 @@ Uses ModernBERT's 8192 token context to handle longer stories.
 """
 
 import os
+import hashlib
 import json
 import torch
 import argparse
+import itertools
+from collections import Counter
 from typing import Iterator, Dict, Any, List, Tuple
 from torch.utils.data import IterableDataset, Dataset
+from rune.ner.label_alignment import align_labels_pretokenized
 from transformers import (
     AutoTokenizer,
     AutoModelForTokenClassification,
@@ -17,9 +21,17 @@ from transformers import (
     Trainer,
     DataCollatorForTokenClassification,
     EarlyStoppingCallback,
+    set_seed,
 )
-from seqeval.metrics import f1_score, accuracy_score
+from seqeval.metrics import f1_score, accuracy_score, classification_report
 from rune.data.story_preprocessor import StoryPreprocessor
+
+try:
+    from peft import LoraConfig, TaskType, get_peft_model
+except ImportError:
+    LoraConfig = None
+    TaskType = None
+    get_peft_model = None
 
 
 class ModernBERTStreamingDataset(IterableDataset):
@@ -110,7 +122,7 @@ class ModernBERTStreamingDataset(IterableDataset):
                 next(f)
 
             count = 0
-            filtered_count = 0
+            truncated_count = 0
 
             for line in f:
                 if self.limit and count >= self.limit:
@@ -137,10 +149,9 @@ class ModernBERTStreamingDataset(IterableDataset):
                     )
                     token_length = len(test_tokenized["input_ids"])
 
-                    # Filter if too long
+                    # Keep every example; tokenizer truncation handles max_length.
                     if token_length > self.max_length:
-                        filtered_count += 1
-                        continue
+                        truncated_count += 1
 
                     # Tokenize and align labels
                     tokenized = self._tokenize_and_align_labels(processed)
@@ -152,47 +163,28 @@ class ModernBERTStreamingDataset(IterableDataset):
                     print(f"⚠️  Error processing story: {e}")
                     continue
 
-            if filtered_count > 0:
-                print(f"📊 Filtered {filtered_count} stories exceeding {self.max_length} tokens")
-            print(f"✅ Yielded {count} stories within token limit")
+            if truncated_count > 0:
+                print(f"📊 Truncated {truncated_count} stories to {self.max_length} tokens")
+            print(f"✅ Yielded {count} stories (tokenizer truncation only)")
 
     def _tokenize_and_align_labels(self, story: Dict[str, Any]) -> Dict[str, Any]:
-        """Tokenize story and align labels."""
+        """Tokenize story and align labels using canonical pretokenized aligner."""
         tokens = story["tokens"]
         bio_tags = story["bio_tags"]
 
-        # Tokenize
-        tokenized_inputs = self.tokenizer(
-            tokens,
-            truncation=True,
-            is_split_into_words=True,
+        result = align_labels_pretokenized(
+            tokens=tokens,
+            bio_tags=bio_tags,
+            tokenizer=self.tokenizer,
             max_length=self.max_length,
-            padding="max_length",
-            return_tensors="pt",
+            label_to_id=self.label_to_id,
+            simplify_labels=self.simplify_labels,
         )
 
-        # Align labels
-        word_ids = tokenized_inputs.word_ids()
-        labels = []
-        previous_word_idx = None
-
-        for word_idx in word_ids:
-            if word_idx is None:
-                labels.append(-100)
-            elif word_idx != previous_word_idx:
-                tag = bio_tags[word_idx]
-                # Apply simplification if enabled
-                if self.simplify_labels and self.role_to_simple:
-                    tag = self.role_to_simple.get(tag, tag)
-                labels.append(self.label_to_id.get(tag, 0))
-            else:
-                labels.append(-100)
-            previous_word_idx = word_idx
-
         return {
-            "input_ids": tokenized_inputs["input_ids"].squeeze(0),
-            "attention_mask": tokenized_inputs["attention_mask"].squeeze(0),
-            "labels": torch.tensor(labels, dtype=torch.long),
+            "input_ids": torch.tensor(result["input_ids"], dtype=torch.long),
+            "attention_mask": torch.tensor(result["attention_mask"], dtype=torch.long),
+            "labels": torch.tensor(result["labels"], dtype=torch.long),
         }
 
 
@@ -219,6 +211,13 @@ def create_compute_metrics(label_list):
 
         fine_grained_f1 = f1_score(true_labels, true_predictions)
         token_accuracy = accuracy_score(true_labels, true_predictions)
+        report = classification_report(true_labels, true_predictions, output_dict=True, zero_division=0)
+
+        def _metric(section: str, key: str = "f1-score") -> float:
+            value = report.get(section, {})
+            if isinstance(value, dict):
+                return float(value.get(key, 0.0))
+            return 0.0
 
         true_binary = [
             ["ENTITY" if label != "O" else "O" for label in sequence]
@@ -236,6 +235,14 @@ def create_compute_metrics(label_list):
 
         return {
             "f1": fine_grained_f1,
+            "micro_f1": _metric("micro avg"),
+            "macro_f1": _metric("macro avg"),
+            "weighted_f1": _metric("weighted avg"),
+            "per_f1": _metric("PERSON"),
+            "loc_f1": _metric("LOCATION"),
+            "agt_f1": _metric("AGENT"),
+            "loc_recall": _metric("LOCATION", "recall"),
+            "agt_recall": _metric("AGENT", "recall"),
             "accuracy": token_accuracy,
             "entity_detection_f1": entity_detection_f1,
             "entity_accuracy": entity_accuracy,
@@ -308,45 +315,24 @@ class OODValidationDataset(Dataset):
         return len(self.examples)
     
     def __getitem__(self, idx):
-        """Get a single example."""
+        """Get a single example using canonical pretokenized aligner."""
         example = self.examples[idx]
         tokens = example['tokens']
         bio_tags = example['bio_tags']
-        
-        # Truncate if needed
-        if len(tokens) > self.max_length:
-            tokens = tokens[:self.max_length]
-            bio_tags = bio_tags[:self.max_length]
-        
-        # Simplify labels if needed
-        if self.simplify_labels and self.role_to_simple:
-            bio_tags = [self.role_to_simple.get(tag, tag) for tag in bio_tags]
-        
-        # Convert to IDs
-        label_ids = [self.label_to_id.get(tag, 0) for tag in bio_tags]
-        
-        # Tokenize (already tokenized, so just convert to input_ids)
-        tokenized = self.tokenizer(
-            tokens,
-            is_split_into_words=True,
-            truncation=True,
+
+        result = align_labels_pretokenized(
+            tokens=tokens,
+            bio_tags=bio_tags,
+            tokenizer=self.tokenizer,
             max_length=self.max_length,
-            padding=False
+            label_to_id=self.label_to_id,
+            simplify_labels=self.simplify_labels,
         )
-        
-        # Align labels with subword tokens
-        word_ids = tokenized.word_ids()
-        aligned_labels = []
-        for word_id in word_ids:
-            if word_id is None:
-                aligned_labels.append(-100)
-            else:
-                aligned_labels.append(label_ids[word_id])
-        
+
         return {
-            'input_ids': tokenized['input_ids'],
-            'attention_mask': tokenized['attention_mask'],
-            'labels': aligned_labels
+            'input_ids': result['input_ids'],
+            'attention_mask': result['attention_mask'],
+            'labels': result['labels'],
         }
 
 
@@ -370,6 +356,108 @@ class WeightedLossTrainer(Trainer):
 
         loss = loss_fn(logits.view(-1, logits.size(-1)), labels.view(-1))
         return (loss, outputs) if return_outputs else loss
+
+
+def freeze_bottom_layers(model, num_layers: int, freeze_embeddings: bool = False) -> None:
+    """Freeze embeddings and the first N encoder layers in-place."""
+    if num_layers <= 0 and not freeze_embeddings:
+        return
+
+    backbone = getattr(model, "model", None)
+    if backbone is None or not hasattr(backbone, "layers"):
+        raise ValueError("freeze_bottom_layers expects a ModernBERT token-classification model")
+
+    if freeze_embeddings and hasattr(backbone, "embeddings"):
+        for param in backbone.embeddings.parameters():
+            param.requires_grad = False
+
+    for layer_idx, layer in enumerate(backbone.layers):
+        if layer_idx >= num_layers:
+            break
+        for param in layer.parameters():
+            param.requires_grad = False
+
+
+def apply_lora(model, args):
+    """Wrap the token-classification model with LoRA adapters."""
+    if get_peft_model is None or LoraConfig is None or TaskType is None:
+        raise ImportError("peft is not installed; cannot use --use-lora")
+
+    target_modules = [m.strip() for m in args.lora_target_modules.split(",") if m.strip()]
+    if not target_modules:
+        raise ValueError("--lora-target-modules resolved to an empty list")
+
+    lora_config = LoraConfig(
+        task_type=TaskType.TOKEN_CLS,
+        r=args.lora_r,
+        lora_alpha=args.lora_alpha,
+        lora_dropout=args.lora_dropout,
+        target_modules=target_modules,
+        bias="none",
+        modules_to_save=["classifier"],
+    )
+    model = get_peft_model(model, lora_config)
+    model.print_trainable_parameters()
+    return model
+
+
+def summarize_trainable_parameters(model, prefix: str = "🧮") -> None:
+    total = 0
+    trainable = 0
+    for param in model.parameters():
+        count = param.numel()
+        total += count
+        if param.requires_grad:
+            trainable += count
+    pct = (100.0 * trainable / total) if total else 0.0
+    print(f"{prefix} Trainable params: {trainable:,} / {total:,} ({pct:.2f}%)")
+
+
+def detect_prefiltered_format(jsonl_path: str) -> bool:
+    """Detect whether a JSONL dataset is pre-tokenized."""
+    with open(jsonl_path, "r", encoding="utf-8") as fh:
+        for line in fh:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            return "tokens" in row and "bio_tags" in row
+    return False
+
+
+def summarize_label_stream(dataset, id_to_label, name: str, sample_limit: int = 200, require_extended: bool = False):
+    """Print per-label counts from the first N samples of a dataset."""
+    counts = Counter()
+    samples = 0
+
+    for sample in itertools.islice(iter(dataset), sample_limit):
+        labels = sample["labels"]
+        if hasattr(labels, "tolist"):
+            labels = labels.tolist()
+        for label_id in labels:
+            if label_id == -100:
+                continue
+            counts[id_to_label[int(label_id)]] += 1
+        samples += 1
+
+    print(f"📊 {name} label counts (first {samples} samples):")
+    for label_id in range(len(id_to_label)):
+        label = id_to_label[label_id]
+        print(f"   {label:15s}: {counts.get(label, 0)}")
+
+    if require_extended:
+        extended_total = (
+            counts.get("B-LOCATION", 0)
+            + counts.get("I-LOCATION", 0)
+            + counts.get("B-AGENT", 0)
+            + counts.get("I-AGENT", 0)
+        )
+        if extended_total == 0:
+            raise RuntimeError(
+                f"{name} sample contains no LOCATION/AGENT labels while --extended-entities is enabled"
+            )
+
+    print()
+    return counts
 
 
 def load_and_preprocess_ood(
@@ -471,6 +559,10 @@ Examples:
     parser.add_argument('--curriculum-stage2-input', default=None, help="Stage 2 input (hard examples)")
     parser.add_argument('--curriculum-stage1-epochs', type=int, default=2, help="Stage 1 epochs")
     parser.add_argument('--curriculum-stage2-epochs', type=int, default=3, help="Stage 2 epochs")
+    parser.add_argument('--curriculum-stage1-limit', type=int, default=None,
+                        help="Optional max number of stage 1 examples to use")
+    parser.add_argument('--curriculum-stage2-limit', type=int, default=None,
+                        help="Optional max number of stage 2 examples to use")
     
     # Training config
     parser.add_argument('--batch-size', type=int, default=None, help="Per-device batch size (both stages if not specified separately)")
@@ -478,10 +570,24 @@ Examples:
     parser.add_argument('--stage2-batch-size', type=int, default=None, help="Stage 2 batch size (defaults to --batch-size or 4)")
     parser.add_argument('--gradient-accumulation', type=int, default=1, help="Gradient accumulation steps")
     parser.add_argument('--learning-rate', type=float, default=5e-5, help="Learning rate")
+    parser.add_argument('--train-limit', type=int, default=None, help="Optional max number of training examples to use")
     parser.add_argument('--use-bf16', action='store_true', help="Use bfloat16 mixed precision")
+    parser.add_argument('--seed', type=int, default=42, help="Random seed")
     
     # Resuming
     parser.add_argument('--resume-from-checkpoint', default=None, help="Resume from checkpoint path")
+
+    # Parameter-efficient / partial-finetune options
+    parser.add_argument('--use-lora', action='store_true', help="Wrap the model with LoRA adapters")
+    parser.add_argument('--lora-r', type=int, default=8, help="LoRA rank")
+    parser.add_argument('--lora-alpha', type=int, default=16, help="LoRA alpha")
+    parser.add_argument('--lora-dropout', type=float, default=0.05, help="LoRA dropout")
+    parser.add_argument('--lora-target-modules', type=str, default='Wqkv,Wo',
+                        help="Comma-separated module names to target with LoRA")
+    parser.add_argument('--freeze-bottom-layers', type=int, default=0,
+                        help="Freeze the first N encoder layers before training")
+    parser.add_argument('--freeze-embeddings', action='store_true',
+                        help="Freeze token embeddings before training")
     
     # Labels
     parser.add_argument('--simplify-labels', action='store_true', help="Collapse role labels to B/I-PERSON")
@@ -499,29 +605,64 @@ Examples:
     # Extended entities requires simplified labels (role-aware labels don't include LOCATION/AGENT)
     if args.extended_entities:
         args.simplify_labels = True
-    
+
+    # Schema guard: if simplified label vocab (LOCATION/AGENT present), extended_entity_types
+    # must also be True so OOD ground-truth uses the same preprocessor configuration.
+    if args.simplify_labels and not args.extended_entities:
+        raise SystemExit(
+            "ABORT: --simplify-labels creates a PERSON/LOCATION/AGENT label vocabulary but "
+            "--extended-entities was not set.  OOD ground-truth would be preprocessed without "
+            "LOCATION/AGENT entities, causing silent train/eval schema divergence.  "
+            "Pass --extended-entities together with --simplify-labels for v3 training."
+        )
+
+    has_stage1 = args.curriculum and args.curriculum_stage1_epochs > 0
+    has_stage2 = args.curriculum and args.curriculum_stage2_epochs > 0
+
     # Validate arguments
     if args.curriculum:
-        if not args.curriculum_stage1_input or not args.curriculum_stage2_input:
-            parser.error("--curriculum requires --curriculum-stage1-input and --curriculum-stage2-input")
+        if not has_stage1 and not has_stage2:
+            parser.error("--curriculum requires at least one stage with epochs > 0")
+        if has_stage1 and not args.curriculum_stage1_input:
+            parser.error("--curriculum-stage1-input required when --curriculum-stage1-epochs > 0")
+        if has_stage2 and not args.curriculum_stage2_input:
+            parser.error("--curriculum-stage2-input required when --curriculum-stage2-epochs > 0")
     elif not args.input:
         parser.error("--input required for single-stage training (or use --curriculum)")
-    
+
+    if args.use_lora and (args.freeze_bottom_layers > 0 or args.freeze_embeddings):
+        parser.error("--use-lora cannot currently be combined with layer freezing")
+    if args.use_lora and has_stage1:
+        parser.error("--use-lora currently supports single-stage training or curriculum with stage1 skipped")
+
     # Validate OOD flags
     if args.no_test_split and not args.eval_ood:
         print("⚠️  WARNING: --no-test-split without --eval-ood means NO evaluation will occur")
+
+    set_seed(args.seed)
+    
+    # Determine training file and prefiltered status early
+    if args.curriculum:
+        training_file = args.curriculum_stage1_input if has_stage1 else args.curriculum_stage2_input
+        single_stage_prefiltered = False  # Curriculum mode doesn't use prefiltered detection
+    else:
+        training_file = args.input
+        single_stage_prefiltered = detect_prefiltered_format(training_file)
     
     print("🚀 TRAINING RUNE NER")
     print("=" * 70)
     print(f"🤖 Model: {args.model}")
+    print(f"🌱 Seed: {args.seed}")
     print(f"💾 Max length: {args.max_length} tokens")
     if args.curriculum:
         print("🎓 Mode: Curriculum learning (2 stages)")
-        print(f"   Stage 1: {args.curriculum_stage1_input} ({args.curriculum_stage1_epochs} epochs)")
-        print(f"   Stage 2: {args.curriculum_stage2_input} ({args.curriculum_stage2_epochs} epochs)")
+        print(f"   Stage 1: {args.curriculum_stage1_input or '(skipped)'} ({args.curriculum_stage1_epochs} epochs)")
+        print(f"   Stage 2: {args.curriculum_stage2_input or '(skipped)'} ({args.curriculum_stage2_epochs} epochs)")
     else:
         print("📖 Mode: Single-stage training")
         print(f"   Input: {args.input}")
+        print(f"   Input format: {'pretokenized' if single_stage_prefiltered else 'raw'}")
+    print(f"   Label vocabulary: O, B-PERSON, I-PERSON, B-LOCATION, I-LOCATION, B-AGENT, I-AGENT")
     if args.simplify_labels:
         print("🔄 Labels: Simplified B/I-PERSON (role-agnostic)")
     else:
@@ -554,8 +695,13 @@ Examples:
         max_length = stage1_max_length  # For initial display
     else:
         max_length = args.max_length or 8192
-    
-    training_file = args.input if not args.curriculum else args.curriculum_stage1_input
+
+    def _sha256(path: str) -> str:
+        digest = hashlib.sha256()
+        with open(path, "rb") as fh:
+            for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
 
     # Count total stories
     with open(training_file, "r") as f:
@@ -567,7 +713,12 @@ Examples:
         print(f"   Stage 2 max length: {stage2_max_length} tokens")
     else:
         print(f"   Max token length: {max_length}")
-    print(f"   All stories fit within token limit (pre-filtered)")
+    if args.train_limit is not None:
+        print(f"   Train limit: {args.train_limit} stories")
+    print(f"   No length filtering; tokenizer truncation only")
+    print(f"   Dataset SHA256: {_sha256(training_file)}")
+    if args.eval_ood:
+        print(f"   OOD SHA256: {_sha256(args.eval_ood)}")
     print()
 
     # Calculate split (if needed)
@@ -585,6 +736,9 @@ Examples:
         print(f"📊 Train/Val Split:")
         print(f"   Training: {train_count} stories")
         print(f"   Validation: {val_count} stories")
+    if args.train_limit is not None:
+        train_count = min(train_count, args.train_limit)
+        print(f"   Train limit applied: {train_count} stories")
     print()
 
     # Load ModernBERT tokenizer and model
@@ -624,9 +778,25 @@ Examples:
         id2label=id_to_label,
         label2id=label_to_id,
     )
+
+    if args.freeze_bottom_layers or args.freeze_embeddings:
+        freeze_bottom_layers(
+            model,
+            args.freeze_bottom_layers,
+            freeze_embeddings=args.freeze_embeddings,
+        )
+        print(f"🧊 Frozen bottom layers: {args.freeze_bottom_layers}")
+        if args.freeze_embeddings:
+            print("🧊 Frozen embeddings")
+
+    if args.use_lora:
+        print("🪶 Enabling LoRA adapters")
+        model = apply_lora(model, args)
+
     print(f"✅ ModernBERT loaded with {len(label_to_id)} labels")
     print(f"   Labels: {', '.join(label_to_id.keys())}")
     print(f"   Max position embeddings: {model.config.max_position_embeddings}")
+    summarize_trainable_parameters(model)
     print()
 
     # Class weights for weighted loss
@@ -684,7 +854,8 @@ Examples:
         max_length=max_length,
         skip=0,
         limit=train_count,
-        prefiltered=True,  # Data is already pre-processed
+        prefiltered=True if args.curriculum else single_stage_prefiltered,
+        extended_entity_types=args.extended_entities,
         simplify_labels=args.simplify_labels
     )
 
@@ -702,10 +873,11 @@ Examples:
             max_length=max_length,
             skip=val_split_idx,
             limit=val_count,
-            prefiltered=True,  # Data is already pre-processed
+            prefiltered=True if args.curriculum else single_stage_prefiltered,
+            extended_entity_types=args.extended_entities,
             simplify_labels=args.simplify_labels
         )
-        print("✅ Streaming datasets created (using pre-filtered data)")
+        print("✅ Streaming datasets created (tokenizer truncation only)")
     print()
 
     # Output directory
@@ -749,7 +921,7 @@ Examples:
         metric_for_best_model="f1" if has_eval else None,
         greater_is_better=True if has_eval else None,
         gradient_accumulation_steps=args.gradient_accumulation,
-        report_to=None,
+        report_to=[],
         save_total_limit=3,
         bf16=bf16_enabled,
         fp16=fp16_enabled,
@@ -778,38 +950,40 @@ Examples:
         # For curriculum: load OOD for both stages
         if args.curriculum:
             # Stage 1 OOD (filter to stage1_max_length)
-            ood_examples_s1, s1_count, s1_trunc = load_and_preprocess_ood(
-                args.eval_ood,
-                stage1_max_length,
-                warn_truncation=True,
-                extended_entity_types=args.extended_entities,
-            )
-            ood_dataset_stage1 = OODValidationDataset(
-                ood_examples_s1,
-                tokenizer,
-                stage1_max_length,
-                simplify_labels=args.simplify_labels
-            )
-            print(f"✅ Stage 1 OOD: {s1_count} examples (max_length={stage1_max_length})")
-            if s1_trunc > 0:
-                print(f"   ⚠️  {s1_trunc} examples truncated")
+            if has_stage1:
+                ood_examples_s1, s1_count, s1_trunc = load_and_preprocess_ood(
+                    args.eval_ood,
+                    stage1_max_length,
+                    warn_truncation=True,
+                    extended_entity_types=args.extended_entities,
+                )
+                ood_dataset_stage1 = OODValidationDataset(
+                    ood_examples_s1,
+                    tokenizer,
+                    stage1_max_length,
+                    simplify_labels=args.simplify_labels
+                )
+                print(f"✅ Stage 1 OOD: {s1_count} examples (max_length={stage1_max_length})")
+                if s1_trunc > 0:
+                    print(f"   ⚠️  {s1_trunc} examples truncated")
             
             # Stage 2 OOD (filter to stage2_max_length)
-            ood_examples_s2, s2_count, s2_trunc = load_and_preprocess_ood(
-                args.eval_ood,
-                stage2_max_length,
-                warn_truncation=False,  # Don't warn twice
-                extended_entity_types=args.extended_entities,
-            )
-            ood_dataset_stage2 = OODValidationDataset(
-                ood_examples_s2,
-                tokenizer,
-                stage2_max_length,
-                simplify_labels=args.simplify_labels
-            )
-            print(f"✅ Stage 2 OOD: {s2_count} examples (max_length={stage2_max_length})")
-            if s2_trunc > 0:
-                print(f"   ⚠️  {s2_trunc} examples truncated")
+            if has_stage2:
+                ood_examples_s2, s2_count, s2_trunc = load_and_preprocess_ood(
+                    args.eval_ood,
+                    stage2_max_length,
+                    warn_truncation=not has_stage1,
+                    extended_entity_types=args.extended_entities,
+                )
+                ood_dataset_stage2 = OODValidationDataset(
+                    ood_examples_s2,
+                    tokenizer,
+                    stage2_max_length,
+                    simplify_labels=args.simplify_labels
+                )
+                print(f"✅ Stage 2 OOD: {s2_count} examples (max_length={stage2_max_length})")
+                if s2_trunc > 0:
+                    print(f"   ⚠️  {s2_trunc} examples truncated")
         else:
             # Single-stage: load OOD once
             ood_examples, ood_count, ood_trunc = load_and_preprocess_ood(
@@ -854,10 +1028,22 @@ Examples:
         print()
         
         # Count examples in each stage (wc -l)
-        with open(args.curriculum_stage1_input) as f:
-            stage1_count = sum(1 for _ in f)
-        with open(args.curriculum_stage2_input) as f:
-            stage2_count = sum(1 for _ in f)
+        stage1_count = 0
+        stage2_count = 0
+        if has_stage1:
+            with open(args.curriculum_stage1_input) as f:
+                stage1_count = sum(1 for _ in f)
+            if args.curriculum_stage1_limit is not None:
+                stage1_count = min(stage1_count, args.curriculum_stage1_limit)
+            if args.train_limit is not None:
+                stage1_count = min(stage1_count, args.train_limit)
+        if has_stage2:
+            with open(args.curriculum_stage2_input) as f:
+                stage2_count = sum(1 for _ in f)
+            if args.curriculum_stage2_limit is not None:
+                stage2_count = min(stage2_count, args.curriculum_stage2_limit)
+            if args.train_limit is not None:
+                stage2_count = min(stage2_count, args.train_limit)
         
         print(f"📊 Stage 1: {stage1_count:,} examples")
         print(f"📊 Stage 2: {stage2_count:,} examples")
@@ -874,71 +1060,89 @@ Examples:
         
         # Stage 1: Easy examples
         stage1_output = f"{output_dir}/stage1"
-        os.makedirs(stage1_output, exist_ok=True)
-        
-        stage1_args = TrainingArguments(
-            output_dir=stage1_output,
-            max_steps=stage1_steps,
-            per_device_train_batch_size=stage1_batch_size,
-            per_device_eval_batch_size=stage1_batch_size,
-            warmup_steps=500,
-            weight_decay=0.01,
-            learning_rate=args.learning_rate,
-            logging_dir=f"{stage1_output}/logs",
-            logging_steps=100,
-            eval_strategy=eval_strategy,
-            eval_steps=500 if has_eval else None,
-            save_strategy="steps",
-            save_steps=500,
-            load_best_model_at_end=load_best,
-            metric_for_best_model="f1" if has_eval else None,
-            greater_is_better=True if has_eval else None,
-            gradient_accumulation_steps=args.gradient_accumulation,
-            report_to=None,
-            save_total_limit=3,
-            bf16=bf16_enabled,
-            fp16=fp16_enabled,
-            dataloader_num_workers=0,
-        )
-        
-        # Stage 1 datasets
-        stage1_train = ModernBERTStreamingDataset(
-            args.curriculum_stage1_input,
-            tokenizer,
-            max_length=stage1_max_length,
-            prefiltered=True,
-            simplify_labels=args.simplify_labels
-        )
-        
-        # Stage 1 validation: Use OOD if specified, otherwise 5% holdout
-        if args.eval_ood:
-            stage1_val = ood_dataset_stage1
-        elif not args.no_test_split:
-            stage1_val = ModernBERTStreamingDataset(
+        stage1_trainer = None
+        stage1_val = None
+        print(f"🏋️ Stage 1 training ({args.curriculum_stage1_epochs} epochs)...")
+        if has_stage1:
+            os.makedirs(stage1_output, exist_ok=True)
+            stage1_args = TrainingArguments(
+                output_dir=stage1_output,
+                max_steps=stage1_steps,
+                per_device_train_batch_size=stage1_batch_size,
+                per_device_eval_batch_size=stage1_batch_size,
+                warmup_steps=500,
+                weight_decay=0.01,
+                learning_rate=args.learning_rate,
+                logging_dir=f"{stage1_output}/logs",
+                logging_steps=100,
+                eval_strategy=eval_strategy,
+                eval_steps=500 if has_eval else None,
+                save_strategy="steps",
+                save_steps=500,
+                load_best_model_at_end=load_best,
+                metric_for_best_model="f1" if has_eval else None,
+                greater_is_better=True if has_eval else None,
+                gradient_accumulation_steps=args.gradient_accumulation,
+                report_to=[],
+                save_total_limit=3,
+                bf16=bf16_enabled,
+                fp16=fp16_enabled,
+                dataloader_num_workers=0,
+            )
+            # Stage 1 datasets
+            stage1_train = ModernBERTStreamingDataset(
                 args.curriculum_stage1_input,
                 tokenizer,
                 max_length=stage1_max_length,
-                skip=int(0.95 * stage1_count),
                 prefiltered=True,
+                extended_entity_types=args.extended_entities,
+                limit=stage1_count if args.curriculum_stage1_limit is not None else None,
                 simplify_labels=args.simplify_labels
             )
-        else:
-            stage1_val = None
-        
-        stage1_trainer = WeightedLossTrainer(
-            model=model,
-            args=stage1_args,
-            train_dataset=stage1_train,
-            eval_dataset=stage1_val,
-            tokenizer=tokenizer,
-            data_collator=data_collator,
-            compute_metrics=create_compute_metrics(list(id_to_label.values())),
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if stage1_val else [],
-            class_weights=class_weights,
-        )
-        
-        print(f"🏋️ Stage 1 training ({args.curriculum_stage1_epochs} epochs)...")
-        if args.curriculum_stage1_epochs > 0:
+            
+            # Stage 1 validation: Use OOD if specified, otherwise 5% holdout
+            if args.eval_ood:
+                stage1_val = ood_dataset_stage1
+            elif not args.no_test_split:
+                stage1_val = ModernBERTStreamingDataset(
+                    args.curriculum_stage1_input,
+                    tokenizer,
+                    max_length=stage1_max_length,
+                    skip=int(0.95 * stage1_count),
+                    limit=max(stage1_count - int(0.95 * stage1_count), 0),
+                    prefiltered=True,
+                    extended_entity_types=args.extended_entities,
+                    simplify_labels=args.simplify_labels
+                )
+            else:
+                stage1_val = None
+
+            stage1_eval_dataset = ood_dataset_stage1 if args.eval_ood else stage1_val
+            summarize_label_stream(
+                stage1_train,
+                id_to_label,
+                "STAGE 1 TRAIN",
+                require_extended=args.extended_entities,
+            )
+            if stage1_eval_dataset is not None:
+                summarize_label_stream(
+                    stage1_eval_dataset,
+                    id_to_label,
+                    "STAGE 1 EVAL",
+                    require_extended=args.extended_entities,
+                )
+
+            stage1_trainer = WeightedLossTrainer(
+                model=model,
+                args=stage1_args,
+                train_dataset=stage1_train,
+                eval_dataset=stage1_val,
+                tokenizer=tokenizer,
+                data_collator=data_collator,
+                compute_metrics=create_compute_metrics(list(id_to_label.values())),
+                callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if stage1_val else [],
+                class_weights=class_weights,
+            )
             resume_checkpoint = args.resume_from_checkpoint if args.resume_from_checkpoint and "stage1" in args.resume_from_checkpoint else None
             stage1_trainer.train(resume_from_checkpoint=resume_checkpoint)
             stage1_trainer.save_model()
@@ -950,103 +1154,149 @@ Examples:
         # Stage 2: Hard examples (fine-tune from stage 1)
         print(f"🎓 CURRICULUM LEARNING: Stage 2 (Hard)")
         print("=" * 70)
-        
-        stage2_output = f"{output_dir}/stage2"
-        os.makedirs(stage2_output, exist_ok=True)
-        
-        # Load stage 1 model or resume checkpoint
-        if args.resume_from_checkpoint and "stage2" in args.resume_from_checkpoint:
-            print(f"♻️  Resuming Stage 2 from: {args.resume_from_checkpoint}")
-            model_stage2 = AutoModelForTokenClassification.from_pretrained(args.resume_from_checkpoint)
-        elif args.curriculum_stage1_epochs > 0:
-            print(f"📥 Loading Stage 1 model from: {stage1_output}")
-            model_stage2 = AutoModelForTokenClassification.from_pretrained(stage1_output)
-        else:
-            print(f"📥 Using base model (Stage 1 skipped)")
-            model_stage2 = model
-        
-        stage2_args = TrainingArguments(
-            output_dir=stage2_output,
-            max_steps=stage2_steps,
-            per_device_train_batch_size=stage2_batch_size,
-            per_device_eval_batch_size=stage2_batch_size,
-            warmup_steps=500,
-            weight_decay=0.01,
-            learning_rate=args.learning_rate,
-            logging_dir=f"{stage2_output}/logs",
-            logging_steps=100,
-            eval_strategy=eval_strategy,
-            eval_steps=500 if has_eval else None,
-            save_strategy="steps",
-            save_steps=500,
-            load_best_model_at_end=load_best,
-            metric_for_best_model="f1" if has_eval else None,
-            greater_is_better=True if has_eval else None,
-            gradient_accumulation_steps=args.gradient_accumulation,
-            report_to=None,
-            save_total_limit=3,
-            bf16=bf16_enabled,
-            fp16=fp16_enabled,
-            dataloader_num_workers=0,
-        )
-        
-        # Stage 2 datasets
-        stage2_train = ModernBERTStreamingDataset(
-            args.curriculum_stage2_input,
-            tokenizer,
-            max_length=stage2_max_length,
-            prefiltered=True,
-            simplify_labels=args.simplify_labels
-        )
-        
-        # Stage 2 validation: Use OOD if specified, otherwise 5% holdout
-        if args.eval_ood:
-            stage2_val = ood_dataset_stage2
-        elif not args.no_test_split:
-            stage2_val = ModernBERTStreamingDataset(
+        if has_stage2:
+            stage2_output = f"{output_dir}/stage2"
+            os.makedirs(stage2_output, exist_ok=True)
+            
+            # Load stage 1 model or resume checkpoint
+            if args.resume_from_checkpoint and "stage2" in args.resume_from_checkpoint:
+                print(f"♻️  Resuming Stage 2 from: {args.resume_from_checkpoint}")
+                model_stage2 = AutoModelForTokenClassification.from_pretrained(args.resume_from_checkpoint)
+            elif has_stage1:
+                print(f"📥 Loading Stage 1 model from: {stage1_output}")
+                model_stage2 = AutoModelForTokenClassification.from_pretrained(stage1_output)
+            else:
+                print(f"📥 Using base model (Stage 1 skipped)")
+                model_stage2 = model
+
+            if model_stage2 is not model and (args.freeze_bottom_layers or args.freeze_embeddings):
+                freeze_bottom_layers(
+                    model_stage2,
+                    args.freeze_bottom_layers,
+                    freeze_embeddings=args.freeze_embeddings,
+                )
+            summarize_trainable_parameters(model_stage2)
+            
+            stage2_args = TrainingArguments(
+                output_dir=stage2_output,
+                max_steps=stage2_steps,
+                per_device_train_batch_size=stage2_batch_size,
+                per_device_eval_batch_size=stage2_batch_size,
+                warmup_steps=500,
+                weight_decay=0.01,
+                learning_rate=args.learning_rate,
+                logging_dir=f"{stage2_output}/logs",
+                logging_steps=100,
+                eval_strategy=eval_strategy,
+                eval_steps=500 if has_eval else None,
+                save_strategy="steps",
+                save_steps=500,
+                load_best_model_at_end=load_best,
+                metric_for_best_model="f1" if has_eval else None,
+                greater_is_better=True if has_eval else None,
+                gradient_accumulation_steps=args.gradient_accumulation,
+                report_to=[],
+                save_total_limit=3,
+                bf16=bf16_enabled,
+                fp16=fp16_enabled,
+                dataloader_num_workers=0,
+            )
+            
+            # Stage 2 datasets
+            stage2_train = ModernBERTStreamingDataset(
                 args.curriculum_stage2_input,
                 tokenizer,
                 max_length=stage2_max_length,
-                skip=int(0.95 * stage2_count),
                 prefiltered=True,
+                extended_entity_types=args.extended_entities,
+                limit=stage2_count if args.curriculum_stage2_limit is not None else None,
                 simplify_labels=args.simplify_labels
             )
+            
+            # Stage 2 validation: Use OOD if specified, otherwise 5% holdout
+            if args.eval_ood:
+                stage2_val = ood_dataset_stage2
+            elif not args.no_test_split:
+                stage2_val = ModernBERTStreamingDataset(
+                    args.curriculum_stage2_input,
+                    tokenizer,
+                    max_length=stage2_max_length,
+                    skip=int(0.95 * stage2_count),
+                    limit=max(stage2_count - int(0.95 * stage2_count), 0),
+                    prefiltered=True,
+                    extended_entity_types=args.extended_entities,
+                    simplify_labels=args.simplify_labels
+                )
+            else:
+                stage2_val = None
+
+            stage2_eval_dataset = stage2_val
+            summarize_label_stream(
+                stage2_train,
+                id_to_label,
+                "STAGE 2 TRAIN",
+                require_extended=args.extended_entities,
+            )
+            if stage2_eval_dataset is not None:
+                summarize_label_stream(
+                    stage2_eval_dataset,
+                    id_to_label,
+                    "STAGE 2 EVAL",
+                    require_extended=args.extended_entities,
+                )
+            
+            stage2_trainer = WeightedLossTrainer(
+                model=model_stage2,
+                args=stage2_args,
+                train_dataset=stage2_train,
+                eval_dataset=stage2_val,
+                tokenizer=tokenizer,
+                data_collator=data_collator,
+                compute_metrics=create_compute_metrics(list(id_to_label.values())),
+                callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if stage2_val else [],
+                class_weights=class_weights,
+            )
+            
+            print(f"🏋️ Stage 2 training ({args.curriculum_stage2_epochs} epochs)...")
+            resume_checkpoint = args.resume_from_checkpoint if args.resume_from_checkpoint and "stage2" in args.resume_from_checkpoint else None
+            stage2_trainer.train(resume_from_checkpoint=resume_checkpoint)
+            stage2_trainer.save_model()
+            tokenizer.save_pretrained(stage2_output)
+            
+            # Final eval
+            print(f"\n📊 Final evaluation on Stage 2...")
+            eval_results = stage2_trainer.evaluate()
+            
+            print(f"\n📈 FINAL RESULTS:")
+            for key, value in eval_results.items():
+                if key.startswith('eval_'):
+                    metric_name = key.replace('eval_', '').upper()
+                    print(f"   {metric_name}: {value:.4f}")
+            
+            print(f"\n🎉 CURRICULUM TRAINING COMPLETE!")
+            if has_stage1:
+                print(f"📁 Stage 1: {stage1_output}")
+            print(f"📁 Stage 2 (final): {stage2_output}")
+            
+            final_model_path = stage2_output
         else:
-            stage2_val = None
-        
-        stage2_trainer = WeightedLossTrainer(
-            model=model_stage2,
-            args=stage2_args,
-            train_dataset=stage2_train,
-            eval_dataset=stage2_val,
-            tokenizer=tokenizer,
-            data_collator=data_collator,
-            compute_metrics=create_compute_metrics(list(id_to_label.values())),
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=100)] if stage2_val else [],
-            class_weights=class_weights,
-        )
-        
-        print(f"🏋️ Stage 2 training ({args.curriculum_stage2_epochs} epochs)...")
-        resume_checkpoint = args.resume_from_checkpoint if args.resume_from_checkpoint and "stage2" in args.resume_from_checkpoint else None
-        stage2_trainer.train(resume_from_checkpoint=resume_checkpoint)
-        stage2_trainer.save_model()
-        tokenizer.save_pretrained(stage2_output)
-        
-        # Final eval
-        print(f"\n📊 Final evaluation on Stage 2...")
-        eval_results = stage2_trainer.evaluate()
-        
-        print(f"\n📈 FINAL RESULTS:")
-        for key, value in eval_results.items():
-            if key.startswith('eval_'):
-                metric_name = key.replace('eval_', '').upper()
-                print(f"   {metric_name}: {value:.4f}")
-        
-        print(f"\n🎉 CURRICULUM TRAINING COMPLETE!")
-        print(f"📁 Stage 1: {stage1_output}")
-        print(f"📁 Stage 2 (final): {stage2_output}")
-        
-        final_model_path = stage2_output
+            print(f"⏭️  Skipping Stage 2 (0 epochs)\n")
+
+            if stage1_trainer and stage1_val is not None:
+                print(f"📊 Final evaluation on Stage 1...")
+                eval_results = stage1_trainer.evaluate()
+                print(f"\n📈 FINAL RESULTS:")
+                for key, value in eval_results.items():
+                    if key.startswith('eval_'):
+                        metric_name = key.replace('eval_', '').upper()
+                        print(f"   {metric_name}: {value:.4f}")
+            else:
+                print("📊 No final evaluation dataset configured for Stage 1")
+
+            print(f"\n🎉 CURRICULUM TRAINING COMPLETE (Stage 1 only)!")
+            if has_stage1:
+                print(f"📁 Stage 1 (final): {stage1_output}")
+            final_model_path = stage1_output
         
     else:
         # SINGLE-STAGE TRAINING
@@ -1055,6 +1305,19 @@ Examples:
         
         # Use OOD dataset if specified and no split, otherwise use val_dataset
         final_eval_dataset = ood_dataset_stage1 if args.eval_ood else val_dataset
+        summarize_label_stream(
+            train_dataset,
+            id_to_label,
+            "TRAIN",
+            require_extended=args.extended_entities,
+        )
+        if final_eval_dataset is not None:
+            summarize_label_stream(
+                final_eval_dataset,
+                id_to_label,
+                "EVAL",
+                require_extended=args.extended_entities,
+            )
         
         trainer = WeightedLossTrainer(
             model=model,
@@ -1076,6 +1339,11 @@ Examples:
         # Final eval
         print(f"\n📊 Final evaluation...")
         eval_results = trainer.evaluate()
+
+        with open(f"{output_dir}/final_eval_results.json", "w") as f:
+            json.dump(eval_results, f, indent=2)
+        with open(f"{output_dir}/training_log_history.json", "w") as f:
+            json.dump(trainer.state.log_history, f, indent=2)
         
         print(f"\n📈 FINAL RESULTS:")
         for key, value in eval_results.items():
@@ -1094,9 +1362,22 @@ Examples:
         "model": model_name,
         "max_token_length": max_length,
         "total_stories": total_stories,
+        "dataset_sha256": _sha256(training_file),
+        "ood_sha256": _sha256(args.eval_ood) if args.eval_ood else None,
+        "seed": args.seed,
         "streaming": True,
         "label_mapping": label_to_id,
+        "class_weights": class_weights.tolist() if class_weights is not None else None,
         "curriculum": args.curriculum,
+        "curriculum_stage1_epochs": args.curriculum_stage1_epochs if args.curriculum else None,
+        "curriculum_stage2_epochs": args.curriculum_stage2_epochs if args.curriculum else None,
+        "use_lora": args.use_lora,
+        "lora_r": args.lora_r if args.use_lora else None,
+        "lora_alpha": args.lora_alpha if args.use_lora else None,
+        "lora_dropout": args.lora_dropout if args.use_lora else None,
+        "lora_target_modules": args.lora_target_modules if args.use_lora else None,
+        "freeze_bottom_layers": args.freeze_bottom_layers,
+        "freeze_embeddings": args.freeze_embeddings,
     }
     with open(f"{final_model_path}/training_metadata.json", "w") as f:
         js.dump(metadata, f, indent=2)
