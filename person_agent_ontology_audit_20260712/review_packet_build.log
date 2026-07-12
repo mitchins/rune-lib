@@ -1,0 +1,57 @@
+{
+  "audit_id": "person_agent_ontology_audit_20260712",
+  "files": {
+    "person_agent_ontology_audit_20260712/review_packets/reviewer_a_primary.jsonl": "b1f68ec8126ae9c0b6b95223d45b2fcd77f2736b8d99e07778217cdbf795897f",
+    "person_agent_ontology_audit_20260712/review_packets/reviewer_a_secondary.jsonl": "1332c45264fc640c5092e706601d9a404e91abe79c0a1278c7da36187661e5e5",
+    "person_agent_ontology_audit_20260712/review_packets/reviewer_b_primary.jsonl": "e47c9a04d5d891ff3a18f6323db696a9116cd36a031d14745e881e80ec4bed54",
+    "person_agent_ontology_audit_20260712/review_packets/reviewer_b_secondary.jsonl": "c044ec0cfc4e08999d712c5bd3f7904ee66179092ad7f37e7c9c71df630e80d5",
+    "person_agent_ontology_audit_20260712/review_packets/reviewer_c_primary.jsonl": "7bf2f0f70f41db81a106d13d831ab21bfb632b24f1be2c1d83c54efdd7393ea9",
+    "person_agent_ontology_audit_20260712/review_packets/reviewer_c_secondary.jsonl": "5f1256fd11d8a1a631fca11c96c82aa9bc4465f026112375281ee052e0316ade",
+    "person_agent_ontology_audit_20260712/sealed_overlap_assignments.jsonl": "c875770390825275c0c9bb8b39ede52e79beee06ab53d5c3bad48b9e8f3e5aea"
+  },
+  "overlap_fraction": 0.25,
+  "overlap_records": 150,
+  "primary_counts": {
+    "reviewer_a": {
+      "pd1000": 101,
+      "synthetic": 101
+    },
+    "reviewer_b": {
+      "pd1000": 100,
+      "synthetic": 100
+    },
+    "reviewer_c": {
+      "pd1000": 99,
+      "synthetic": 99
+    }
+  },
+  "reviewers": [
+    "reviewer_a",
+    "reviewer_b",
+    "reviewer_c"
+  ],
+  "secondary_counts": {
+    "reviewer_a": {
+      "pd1000": 25,
+      "synthetic": 25
+    },
+    "reviewer_b": {
+      "pd1000": 25,
+      "synthetic": 25
+    },
+    "reviewer_c": {
+      "pd1000": 25,
+      "synthetic": 25
+    }
+  },
+  "seed": 20260712,
+  "synthetic_risky_overlap": {
+    "ai": 7,
+    "artifact": 9,
+    "beast": 7,
+    "deity": 6,
+    "ship": 8,
+    "spirit": 6
+  },
+  "total_records": 600
+}

@@ -1,0 +1,31 @@
+{
+  "source": "ner_training_agent_rich_training_ultra_short_agent_rich_20260703_143554.jsonl",
+  "seed": 20260712,
+  "agent_subtype_population": {
+    "faction": 96534,
+    "cult": 16697,
+    "artifact": 34329,
+    "spirit": 12334,
+    "ai": 13077,
+    "beast": 8677,
+    "deity": 6533,
+    "empire": 8307,
+    "guild": 14954,
+    "ship": 5751
+  },
+  "agent_sample_by_subtype": {
+    "ai": 20,
+    "artifact": 20,
+    "beast": 20,
+    "cult": 20,
+    "deity": 20,
+    "empire": 20,
+    "faction": 20,
+    "guild": 20,
+    "ship": 20,
+    "spirit": 20
+  },
+  "sampled_agents": 200,
+  "sampled_person_edges": 100,
+  "conflicting_person_agent_surfaces": 34
+}

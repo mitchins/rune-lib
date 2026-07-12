@@ -1,0 +1,71 @@
+{
+  "agreement_by_corpus": {
+    "pd1000": {
+      "cohen_kappa": 0.836823497416372,
+      "n": 75,
+      "raw_agreement": 0.8933333333333333
+    },
+    "synthetic": {
+      "cohen_kappa": 0.8646616541353384,
+      "n": 75,
+      "raw_agreement": 0.92
+    }
+  },
+  "agreement_by_declared_synthetic_subtype": {
+    "ai": {
+      "cohen_kappa": 0.5333333333333333,
+      "n": 7,
+      "raw_agreement": 0.7142857142857143
+    },
+    "artifact": {
+      "cohen_kappa": 0.0,
+      "n": 9,
+      "raw_agreement": 0.8888888888888888
+    },
+    "beast": {
+      "cohen_kappa": 0.6111111111111109,
+      "n": 7,
+      "raw_agreement": 0.8571428571428571
+    },
+    "deity": {
+      "cohen_kappa": 1.0,
+      "n": 6,
+      "raw_agreement": 1.0
+    },
+    "empire": {
+      "cohen_kappa": 1.0,
+      "n": 2,
+      "raw_agreement": 1.0
+    },
+    "faction": {
+      "cohen_kappa": 1.0,
+      "n": 3,
+      "raw_agreement": 1.0
+    },
+    "guild": {
+      "cohen_kappa": 1.0,
+      "n": 2,
+      "raw_agreement": 1.0
+    },
+    "ship": {
+      "cohen_kappa": 0.23809523809523808,
+      "n": 8,
+      "raw_agreement": 0.75
+    },
+    "spirit": {
+      "cohen_kappa": 1.0,
+      "n": 6,
+      "raw_agreement": 1.0
+    }
+  },
+  "boundary_error_rate_final": 0.021666666666666667,
+  "cohen_kappa": 0.8550924648081698,
+  "disagreement_rate": 0.09333333333333334,
+  "expanded_context_rate": 0.04666666666666667,
+  "insufficient_context_rate_final": 0.0,
+  "low_confidence_rate_all_initial_reviews": 0.028,
+  "overlap_fraction": 0.25,
+  "overlap_records": 150,
+  "raw_agreement": 0.9066666666666666,
+  "tie_break_rate": 0.021666666666666667
+}

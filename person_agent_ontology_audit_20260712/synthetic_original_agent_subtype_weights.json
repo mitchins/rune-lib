@@ -1,0 +1,30 @@
+{
+  "entity_definitions": {
+    "faction": 97350,
+    "cult": 17227,
+    "artifact": 35250,
+    "spirit": 12506,
+    "ai": 13940,
+    "beast": 8762,
+    "deity": 6693,
+    "empire": 8407,
+    "guild": 15667,
+    "ship": 5821
+  },
+  "declared_mentions": {
+    "faction": 666818,
+    "cult": 98832,
+    "artifact": 232335,
+    "spirit": 94881,
+    "ai": 132951,
+    "beast": 75395,
+    "deity": 44883,
+    "empire": 59756,
+    "guild": 84020,
+    "ship": 37686
+  },
+  "totals": {
+    "entity_definitions": 221623,
+    "declared_mentions": 1527557
+  }
+}

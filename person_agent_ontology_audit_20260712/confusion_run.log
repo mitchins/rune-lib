@@ -1,0 +1,295 @@
+{
+  "development_policy": "Previously tuned-on suites; model predictions are evidence, not ontology adjudication",
+  "models": {
+    "modernbert_base": "iter1_curr2048_short_continue_resume1/checkpoint-500",
+    "modernbert_large": "frozen_models/rune_ner_modernbert_large_a010_20260711"
+  },
+  "datasets": {
+    "pd1000_eval": {
+      "path": "/mnt/storage/gold-books-pd1000/splits/pd1000_eval_windows.jsonl",
+      "rows": 3574,
+      "max_length": 4096
+    },
+    "modern_development": {
+      "path": "ood_validation_ground_truth_extended.jsonl",
+      "rows": 44,
+      "max_length": 4096
+    }
+  },
+  "results": {
+    "modernbert_base": {
+      "pd1000_eval": {
+        "gold_mentions": {
+          "PERSON": 168826,
+          "AGENT": 10583
+        },
+        "retained_gold_mentions": {
+          "PERSON": 168791,
+          "AGENT": 10583
+        },
+        "overlap_type_matrix": [
+          {
+            "gold": "AGENT",
+            "predicted": "AGENT",
+            "count": 3117
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "LOCATION",
+            "count": 891
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "O",
+            "count": 4843
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "PERSON",
+            "count": 1732
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "AGENT",
+            "count": 109
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "LOCATION",
+            "count": 3030
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "O",
+            "count": 9677
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "PERSON",
+            "count": 155975
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "TRUNCATED",
+            "count": 35
+          }
+        ],
+        "required_confusions": {
+          "gold_PERSON_predicted_AGENT": 109,
+          "gold_AGENT_predicted_PERSON": 1732,
+          "gold_AGENT_predicted_O": 4843,
+          "gold_PERSON_predicted_O": 9677,
+          "gold_PERSON_truncated": 35,
+          "gold_AGENT_truncated": 0
+        }
+      },
+      "modern_development": {
+        "gold_mentions": {
+          "PERSON": 2374,
+          "AGENT": 116
+        },
+        "retained_gold_mentions": {
+          "PERSON": 1999,
+          "AGENT": 109
+        },
+        "overlap_type_matrix": [
+          {
+            "gold": "AGENT",
+            "predicted": "AGENT",
+            "count": 71
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "LOCATION",
+            "count": 8
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "O",
+            "count": 23
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "PERSON",
+            "count": 7
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "TRUNCATED",
+            "count": 7
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "AGENT",
+            "count": 3
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "LOCATION",
+            "count": 5
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "O",
+            "count": 99
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "PERSON",
+            "count": 1892
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "TRUNCATED",
+            "count": 375
+          }
+        ],
+        "required_confusions": {
+          "gold_PERSON_predicted_AGENT": 3,
+          "gold_AGENT_predicted_PERSON": 7,
+          "gold_AGENT_predicted_O": 23,
+          "gold_PERSON_predicted_O": 99,
+          "gold_PERSON_truncated": 375,
+          "gold_AGENT_truncated": 7
+        }
+      }
+    },
+    "modernbert_large": {
+      "pd1000_eval": {
+        "gold_mentions": {
+          "PERSON": 168826,
+          "AGENT": 10583
+        },
+        "retained_gold_mentions": {
+          "PERSON": 168791,
+          "AGENT": 10583
+        },
+        "overlap_type_matrix": [
+          {
+            "gold": "AGENT",
+            "predicted": "AGENT",
+            "count": 3735
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "LOCATION",
+            "count": 861
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "O",
+            "count": 4820
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "PERSON",
+            "count": 1167
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "AGENT",
+            "count": 370
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "LOCATION",
+            "count": 3282
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "O",
+            "count": 10281
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "PERSON",
+            "count": 154858
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "TRUNCATED",
+            "count": 35
+          }
+        ],
+        "required_confusions": {
+          "gold_PERSON_predicted_AGENT": 370,
+          "gold_AGENT_predicted_PERSON": 1167,
+          "gold_AGENT_predicted_O": 4820,
+          "gold_PERSON_predicted_O": 10281,
+          "gold_PERSON_truncated": 35,
+          "gold_AGENT_truncated": 0
+        }
+      },
+      "modern_development": {
+        "gold_mentions": {
+          "PERSON": 2374,
+          "AGENT": 116
+        },
+        "retained_gold_mentions": {
+          "PERSON": 1999,
+          "AGENT": 109
+        },
+        "overlap_type_matrix": [
+          {
+            "gold": "AGENT",
+            "predicted": "AGENT",
+            "count": 71
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "LOCATION",
+            "count": 5
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "O",
+            "count": 31
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "PERSON",
+            "count": 2
+          },
+          {
+            "gold": "AGENT",
+            "predicted": "TRUNCATED",
+            "count": 7
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "AGENT",
+            "count": 2
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "LOCATION",
+            "count": 7
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "O",
+            "count": 95
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "PERSON",
+            "count": 1895
+          },
+          {
+            "gold": "PERSON",
+            "predicted": "TRUNCATED",
+            "count": 375
+          }
+        ],
+        "required_confusions": {
+          "gold_PERSON_predicted_AGENT": 2,
+          "gold_AGENT_predicted_PERSON": 2,
+          "gold_AGENT_predicted_O": 31,
+          "gold_PERSON_predicted_O": 95,
+          "gold_PERSON_truncated": 375,
+          "gold_AGENT_truncated": 7
+        }
+      }
+    }
+  }
+}

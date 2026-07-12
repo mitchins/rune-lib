@@ -1,0 +1,38 @@
+{
+  "ontology_version": "rune_ner_ontology.v1",
+  "status": "frozen",
+  "labels": ["PERSON", "LOCATION", "AGENT"],
+  "primary_distinction": {
+    "individual_actor": "PERSON",
+    "collective_or_institutional_actor": "AGENT",
+    "physical_place": "LOCATION",
+    "ambiguous": "REVIEW"
+  },
+  "person_includes": [
+    "human",
+    "sentient_ai",
+    "deity",
+    "individual_alien",
+    "sapient_animal",
+    "individual_android_or_construct",
+    "individual_supernatural_being",
+    "sentient_ship_or_system_as_individual_character"
+  ],
+  "agent_includes": [
+    "organization",
+    "institution",
+    "government",
+    "faction",
+    "guild",
+    "army",
+    "company",
+    "council",
+    "church_or_religion_acting_institutionally",
+    "species_people_or_collective_acting_as_group",
+    "unnamed_concrete_coordinated_group",
+    "non_sentient_ship_used_metonymically_for_acting_crew"
+  ],
+  "canonical_metadata_affects_span": false,
+  "repeated_surfaces_require_contextual_resolution": true,
+  "ambiguity_disposition": "REVIEW_OR_MASK"
+}

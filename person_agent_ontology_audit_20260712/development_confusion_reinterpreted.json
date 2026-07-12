@@ -1,0 +1,1551 @@
+{
+  "by_adjudicated_ontology_subtype": {
+    "modernbert_base:modern:abstract or event": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_base:modern:collective people": {
+      "model_omission_after_adjudication": 2
+    },
+    "modernbert_base:modern:deity": {
+      "evaluation_label_drift_explains_model_error": 1
+    },
+    "modernbert_base:modern:human individual": {
+      "evaluation_label_drift_explains_model_error": 3,
+      "model_omission_after_adjudication": 8
+    },
+    "modernbert_base:modern:institution": {
+      "model_omission_after_adjudication": 10,
+      "model_type_confusion_after_adjudication": 3
+    },
+    "modernbert_base:modern:non-agent modifier": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_base:modern:organized collective": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_base:modern:people collective": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_base:modern:sentient construct": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_base:modern:truncated entity span": {
+      "audit_unresolved_or_boundary": 5
+    },
+    "modernbert_base:pd1000_eval:abstract concept": {
+      "model_omission_after_adjudication": 13
+    },
+    "modernbert_base:pd1000_eval:abstract or event": {
+      "model_omission_after_adjudication": 5
+    },
+    "modernbert_base:pd1000_eval:artifact": {
+      "model_omission_after_adjudication": 5,
+      "model_type_confusion_after_adjudication": 3
+    },
+    "modernbert_base:pd1000_eval:collective people": {
+      "model_omission_after_adjudication": 10
+    },
+    "modernbert_base:pd1000_eval:deity": {
+      "evaluation_label_drift_explains_model_error": 3,
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_base:pd1000_eval:human individual": {
+      "evaluation_label_drift_explains_model_error": 15,
+      "model_omission_after_adjudication": 12
+    },
+    "modernbert_base:pd1000_eval:institution": {
+      "model_omission_after_adjudication": 13,
+      "model_type_confusion_after_adjudication": 1
+    },
+    "modernbert_base:pd1000_eval:military organization": {
+      "model_omission_after_adjudication": 4,
+      "model_type_confusion_after_adjudication": 1
+    },
+    "modernbert_base:pd1000_eval:organized collective": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_base:pd1000_eval:people collective": {
+      "model_omission_after_adjudication": 12,
+      "model_type_confusion_after_adjudication": 1
+    },
+    "modernbert_base:pd1000_eval:place": {
+      "model_omission_after_adjudication": 3
+    },
+    "modernbert_base:pd1000_eval:sapient animal": {
+      "evaluation_label_drift_explains_model_error": 2,
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_base:pd1000_eval:sentient ai": {
+      "evaluation_label_drift_explains_model_error": 1
+    },
+    "modernbert_base:pd1000_eval:sentient construct": {
+      "evaluation_label_drift_explains_model_error": 1
+    },
+    "modernbert_base:pd1000_eval:supernatural individual": {
+      "evaluation_label_drift_explains_model_error": 2,
+      "model_omission_after_adjudication": 4
+    },
+    "modernbert_base:pd1000_eval:truncated entity span": {
+      "audit_unresolved_or_boundary": 5
+    },
+    "modernbert_base:pd1000_eval:truncated referent": {
+      "audit_unresolved_or_boundary": 7
+    },
+    "modernbert_large:modern:abstract or event": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_large:modern:deity": {
+      "evaluation_label_drift_explains_model_error": 1
+    },
+    "modernbert_large:modern:human individual": {
+      "model_omission_after_adjudication": 10
+    },
+    "modernbert_large:modern:institution": {
+      "model_omission_after_adjudication": 17,
+      "model_type_confusion_after_adjudication": 1
+    },
+    "modernbert_large:modern:military organization": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_large:modern:non-agent modifier": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_large:modern:organized collective": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_large:modern:sentient construct": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_large:modern:truncated entity span": {
+      "audit_unresolved_or_boundary": 6
+    },
+    "modernbert_large:modern:truncated referent": {
+      "audit_unresolved_or_boundary": 1
+    },
+    "modernbert_large:pd1000_eval:abstract concept": {
+      "model_omission_after_adjudication": 13
+    },
+    "modernbert_large:pd1000_eval:abstract or event": {
+      "model_omission_after_adjudication": 6
+    },
+    "modernbert_large:pd1000_eval:artifact": {
+      "model_omission_after_adjudication": 7
+    },
+    "modernbert_large:pd1000_eval:collective people": {
+      "model_omission_after_adjudication": 6
+    },
+    "modernbert_large:pd1000_eval:deity": {
+      "evaluation_label_drift_explains_model_error": 2,
+      "model_omission_after_adjudication": 2
+    },
+    "modernbert_large:pd1000_eval:human individual": {
+      "evaluation_label_drift_explains_model_error": 13,
+      "model_omission_after_adjudication": 12
+    },
+    "modernbert_large:pd1000_eval:institution": {
+      "model_omission_after_adjudication": 11
+    },
+    "modernbert_large:pd1000_eval:military organization": {
+      "model_omission_after_adjudication": 3
+    },
+    "modernbert_large:pd1000_eval:non-agent modifier": {
+      "model_omission_after_adjudication": 1
+    },
+    "modernbert_large:pd1000_eval:people collective": {
+      "model_omission_after_adjudication": 11
+    },
+    "modernbert_large:pd1000_eval:place": {
+      "model_omission_after_adjudication": 1,
+      "model_type_confusion_after_adjudication": 1
+    },
+    "modernbert_large:pd1000_eval:sapient animal": {
+      "evaluation_label_drift_explains_model_error": 2,
+      "model_omission_after_adjudication": 2
+    },
+    "modernbert_large:pd1000_eval:sentient ai": {
+      "evaluation_label_drift_explains_model_error": 1
+    },
+    "modernbert_large:pd1000_eval:sentient construct": {
+      "evaluation_label_drift_explains_model_error": 1
+    },
+    "modernbert_large:pd1000_eval:supernatural individual": {
+      "evaluation_label_drift_explains_model_error": 1,
+      "model_omission_after_adjudication": 9
+    },
+    "modernbert_large:pd1000_eval:truncated entity span": {
+      "audit_unresolved_or_boundary": 5
+    },
+    "modernbert_large:pd1000_eval:truncated referent": {
+      "audit_unresolved_or_boundary": 4
+    }
+  },
+  "by_original_confusion": {
+    "modernbert_base:modern:gold_AGENT_predicted_O": {
+      "audit_unresolved_or_boundary": 5,
+      "model_omission_after_adjudication": 18
+    },
+    "modernbert_base:modern:gold_AGENT_predicted_PERSON": {
+      "evaluation_label_drift_explains_model_error": 4,
+      "model_type_confusion_after_adjudication": 3
+    },
+    "modernbert_base:modern:gold_PERSON_predicted_O": {
+      "model_omission_after_adjudication": 7
+    },
+    "modernbert_base:pd1000_eval:gold_AGENT_predicted_O": {
+      "audit_unresolved_or_boundary": 10,
+      "model_omission_after_adjudication": 81
+    },
+    "modernbert_base:pd1000_eval:gold_AGENT_predicted_PERSON": {
+      "audit_unresolved_or_boundary": 1,
+      "evaluation_label_drift_explains_model_error": 24,
+      "model_type_confusion_after_adjudication": 6
+    },
+    "modernbert_base:pd1000_eval:gold_PERSON_predicted_O": {
+      "audit_unresolved_or_boundary": 1,
+      "model_omission_after_adjudication": 3
+    },
+    "modernbert_large:modern:gold_AGENT_predicted_O": {
+      "audit_unresolved_or_boundary": 5,
+      "model_omission_after_adjudication": 26
+    },
+    "modernbert_large:modern:gold_AGENT_predicted_PERSON": {
+      "evaluation_label_drift_explains_model_error": 1,
+      "model_type_confusion_after_adjudication": 1
+    },
+    "modernbert_large:modern:gold_PERSON_predicted_O": {
+      "audit_unresolved_or_boundary": 2,
+      "model_omission_after_adjudication": 6
+    },
+    "modernbert_large:pd1000_eval:gold_AGENT_predicted_O": {
+      "audit_unresolved_or_boundary": 9,
+      "model_omission_after_adjudication": 80
+    },
+    "modernbert_large:pd1000_eval:gold_AGENT_predicted_PERSON": {
+      "evaluation_label_drift_explains_model_error": 20,
+      "model_type_confusion_after_adjudication": 1
+    },
+    "modernbert_large:pd1000_eval:gold_PERSON_predicted_O": {
+      "model_omission_after_adjudication": 4
+    }
+  },
+  "development_adjudication_rates": {
+    "modern": {
+      "ambiguous_or_insufficient": 1,
+      "boundary_errors": 7,
+      "by_current_label": {
+        "AGENT": {
+          "error_rate": {
+            "ci95": [
+              0.13595102656280073,
+              0.28429533461609774
+            ],
+            "interval_method": "Wilson score",
+            "n": 110,
+            "rate": 0.2
+          },
+          "n": 110,
+          "transitions": {
+            "AGENT": 88,
+            "NEITHER": 5,
+            "PERSON": 17
+          }
+        },
+        "PERSON": {
+          "error_rate": {
+            "ci95": [
+              3.469446951953614e-18,
+              0.037719990121680605
+            ],
+            "interval_method": "Wilson score",
+            "n": 98,
+            "rate": 0.0
+          },
+          "n": 98,
+          "transitions": {
+            "PERSON": 98
+          }
+        }
+      },
+      "sample_records": 216,
+      "semantic_records": 208,
+      "transitions": {
+        "AGENT->AGENT": 88,
+        "AGENT->NEITHER": 5,
+        "AGENT->PERSON": 17,
+        "PERSON->PERSON": 98
+      }
+    },
+    "pd1000_eval": {
+      "ambiguous_or_insufficient": 0,
+      "boundary_errors": 16,
+      "by_current_label": {
+        "AGENT": {
+          "error_rate": {
+            "ci95": [
+              0.4474500917254436,
+              0.5892295691996852
+            ],
+            "interval_method": "Wilson score",
+            "n": 187,
+            "rate": 0.5187165775401069
+          },
+          "n": 187,
+          "transitions": {
+            "AGENT": 90,
+            "NEITHER": 50,
+            "PERSON": 47
+          }
+        },
+        "PERSON": {
+          "error_rate": {
+            "ci95": [
+              0.01057334494855243,
+              0.08702003515310984
+            ],
+            "interval_method": "Wilson score",
+            "n": 97,
+            "rate": 0.030927835051546393
+          },
+          "n": 97,
+          "transitions": {
+            "NEITHER": 3,
+            "PERSON": 94
+          }
+        }
+      },
+      "sample_records": 300,
+      "semantic_records": 284,
+      "transitions": {
+        "AGENT->AGENT": 90,
+        "AGENT->NEITHER": 50,
+        "AGENT->PERSON": 47,
+        "PERSON->NEITHER": 3,
+        "PERSON->PERSON": 94
+      }
+    }
+  },
+  "examples": [
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Pantagruelion"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Holy Bottle"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_type_confusion_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Pantagruelion"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_type_confusion_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Holy Bottle"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_type_confusion_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Holy Bottle"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Huguenots"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "DANES"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Romans"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Welsh"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Kirghiz"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Scots"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "trade"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Trade"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Patrol"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_type_confusion_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Doones"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Daily Mail"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Wallachians"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Romans"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Snookums"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Snookums"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Snookums"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_type_confusion_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Bradbury & Evans"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Teutonic Knights"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_type_confusion_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Mamelukes"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Crusaders"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Demeter"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Poseidon"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Zeus"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Zeus"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "the Folk"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "the Folk"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Karaz"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Montmorency"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "PERSON",
+      "prediction": "O",
+      "surface": "I"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "the Fox"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "the Cat"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "therns"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Shining One"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Shining One"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Caesar"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "consistory"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "army"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "French"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "court"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "French"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "confederates"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Italian"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Odet de Reberac"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Swiss"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "French"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "friend"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "state"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Sforza"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Dominican"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "friend"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "French"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "honour"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Duchess of Ferrara"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Caesar"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Church"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "cabinet"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Capo d\u2019 Anno"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "court"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "friend"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "measures"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Protestant"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Thee"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "M . de Brogue"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Catholics"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Protestant"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Swiss"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Huguenots"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Cavalier"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Camisards"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Catholic"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Protestants"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "PERSON",
+      "prediction": "O",
+      "surface": "I"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "French"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Rhone"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "state"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "state"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "host"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "grace"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "anger"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "knight"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "M . de Fellievre"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Scottish"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "cause"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "evaluation_label_drift_explains_model_error",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Derby"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "PERSON",
+      "surface": "Scots"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "\u2019 Landmannschaft"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "tender"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "conclave"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "devil"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "PERSON",
+      "prediction": "O",
+      "surface": "God"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "market - place"
+    },
+    {
+      "adjudicated": "NEITHER",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "cross"
+    },
+    {
+      "adjudicated": "AGENT",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "court"
+    },
+    {
+      "adjudicated": "PERSON",
+      "category": "model_omission_after_adjudication",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Psalmist"
+    },
+    {
+      "adjudicated": "BAD_BOUNDARY",
+      "category": "audit_unresolved_or_boundary",
+      "corpus": "pd1000_eval",
+      "model": "modernbert_base",
+      "old_gold": "AGENT",
+      "prediction": "O",
+      "surface": "Camaldulian"
+    }
+  ],
+  "original_confusion_matrices": {
+    "datasets": {
+      "modern_development": {
+        "max_length": 4096,
+        "path": "ood_validation_ground_truth_extended.jsonl",
+        "rows": 44
+      },
+      "pd1000_eval": {
+        "max_length": 4096,
+        "path": "/mnt/storage/gold-books-pd1000/splits/pd1000_eval_windows.jsonl",
+        "rows": 3574
+      }
+    },
+    "development_policy": "Previously tuned-on suites; model predictions are evidence, not ontology adjudication",
+    "models": {
+      "modernbert_base": "iter1_curr2048_short_continue_resume1/checkpoint-500",
+      "modernbert_large": "frozen_models/rune_ner_modernbert_large_a010_20260711"
+    },
+    "results": {
+      "modernbert_base": {
+        "modern_development": {
+          "gold_mentions": {
+            "AGENT": 116,
+            "PERSON": 2374
+          },
+          "overlap_type_matrix": [
+            {
+              "count": 71,
+              "gold": "AGENT",
+              "predicted": "AGENT"
+            },
+            {
+              "count": 8,
+              "gold": "AGENT",
+              "predicted": "LOCATION"
+            },
+            {
+              "count": 23,
+              "gold": "AGENT",
+              "predicted": "O"
+            },
+            {
+              "count": 7,
+              "gold": "AGENT",
+              "predicted": "PERSON"
+            },
+            {
+              "count": 7,
+              "gold": "AGENT",
+              "predicted": "TRUNCATED"
+            },
+            {
+              "count": 3,
+              "gold": "PERSON",
+              "predicted": "AGENT"
+            },
+            {
+              "count": 5,
+              "gold": "PERSON",
+              "predicted": "LOCATION"
+            },
+            {
+              "count": 99,
+              "gold": "PERSON",
+              "predicted": "O"
+            },
+            {
+              "count": 1892,
+              "gold": "PERSON",
+              "predicted": "PERSON"
+            },
+            {
+              "count": 375,
+              "gold": "PERSON",
+              "predicted": "TRUNCATED"
+            }
+          ],
+          "required_confusions": {
+            "gold_AGENT_predicted_O": 23,
+            "gold_AGENT_predicted_PERSON": 7,
+            "gold_AGENT_truncated": 7,
+            "gold_PERSON_predicted_AGENT": 3,
+            "gold_PERSON_predicted_O": 99,
+            "gold_PERSON_truncated": 375
+          },
+          "retained_gold_mentions": {
+            "AGENT": 109,
+            "PERSON": 1999
+          }
+        },
+        "pd1000_eval": {
+          "gold_mentions": {
+            "AGENT": 10583,
+            "PERSON": 168826
+          },
+          "overlap_type_matrix": [
+            {
+              "count": 3117,
+              "gold": "AGENT",
+              "predicted": "AGENT"
+            },
+            {
+              "count": 891,
+              "gold": "AGENT",
+              "predicted": "LOCATION"
+            },
+            {
+              "count": 4843,
+              "gold": "AGENT",
+              "predicted": "O"
+            },
+            {
+              "count": 1732,
+              "gold": "AGENT",
+              "predicted": "PERSON"
+            },
+            {
+              "count": 109,
+              "gold": "PERSON",
+              "predicted": "AGENT"
+            },
+            {
+              "count": 3030,
+              "gold": "PERSON",
+              "predicted": "LOCATION"
+            },
+            {
+              "count": 9677,
+              "gold": "PERSON",
+              "predicted": "O"
+            },
+            {
+              "count": 155975,
+              "gold": "PERSON",
+              "predicted": "PERSON"
+            },
+            {
+              "count": 35,
+              "gold": "PERSON",
+              "predicted": "TRUNCATED"
+            }
+          ],
+          "required_confusions": {
+            "gold_AGENT_predicted_O": 4843,
+            "gold_AGENT_predicted_PERSON": 1732,
+            "gold_AGENT_truncated": 0,
+            "gold_PERSON_predicted_AGENT": 109,
+            "gold_PERSON_predicted_O": 9677,
+            "gold_PERSON_truncated": 35
+          },
+          "retained_gold_mentions": {
+            "AGENT": 10583,
+            "PERSON": 168791
+          }
+        }
+      },
+      "modernbert_large": {
+        "modern_development": {
+          "gold_mentions": {
+            "AGENT": 116,
+            "PERSON": 2374
+          },
+          "overlap_type_matrix": [
+            {
+              "count": 71,
+              "gold": "AGENT",
+              "predicted": "AGENT"
+            },
+            {
+              "count": 5,
+              "gold": "AGENT",
+              "predicted": "LOCATION"
+            },
+            {
+              "count": 31,
+              "gold": "AGENT",
+              "predicted": "O"
+            },
+            {
+              "count": 2,
+              "gold": "AGENT",
+              "predicted": "PERSON"
+            },
+            {
+              "count": 7,
+              "gold": "AGENT",
+              "predicted": "TRUNCATED"
+            },
+            {
+              "count": 2,
+              "gold": "PERSON",
+              "predicted": "AGENT"
+            },
+            {
+              "count": 7,
+              "gold": "PERSON",
+              "predicted": "LOCATION"
+            },
+            {
+              "count": 95,
+              "gold": "PERSON",
+              "predicted": "O"
+            },
+            {
+              "count": 1895,
+              "gold": "PERSON",
+              "predicted": "PERSON"
+            },
+            {
+              "count": 375,
+              "gold": "PERSON",
+              "predicted": "TRUNCATED"
+            }
+          ],
+          "required_confusions": {
+            "gold_AGENT_predicted_O": 31,
+            "gold_AGENT_predicted_PERSON": 2,
+            "gold_AGENT_truncated": 7,
+            "gold_PERSON_predicted_AGENT": 2,
+            "gold_PERSON_predicted_O": 95,
+            "gold_PERSON_truncated": 375
+          },
+          "retained_gold_mentions": {
+            "AGENT": 109,
+            "PERSON": 1999
+          }
+        },
+        "pd1000_eval": {
+          "gold_mentions": {
+            "AGENT": 10583,
+            "PERSON": 168826
+          },
+          "overlap_type_matrix": [
+            {
+              "count": 3735,
+              "gold": "AGENT",
+              "predicted": "AGENT"
+            },
+            {
+              "count": 861,
+              "gold": "AGENT",
+              "predicted": "LOCATION"
+            },
+            {
+              "count": 4820,
+              "gold": "AGENT",
+              "predicted": "O"
+            },
+            {
+              "count": 1167,
+              "gold": "AGENT",
+              "predicted": "PERSON"
+            },
+            {
+              "count": 370,
+              "gold": "PERSON",
+              "predicted": "AGENT"
+            },
+            {
+              "count": 3282,
+              "gold": "PERSON",
+              "predicted": "LOCATION"
+            },
+            {
+              "count": 10281,
+              "gold": "PERSON",
+              "predicted": "O"
+            },
+            {
+              "count": 154858,
+              "gold": "PERSON",
+              "predicted": "PERSON"
+            },
+            {
+              "count": 35,
+              "gold": "PERSON",
+              "predicted": "TRUNCATED"
+            }
+          ],
+          "required_confusions": {
+            "gold_AGENT_predicted_O": 4820,
+            "gold_AGENT_predicted_PERSON": 1167,
+            "gold_AGENT_truncated": 0,
+            "gold_PERSON_predicted_AGENT": 370,
+            "gold_PERSON_predicted_O": 10281,
+            "gold_PERSON_truncated": 35
+          },
+          "retained_gold_mentions": {
+            "AGENT": 10583,
+            "PERSON": 168791
+          }
+        }
+      }
+    }
+  },
+  "sampled_model_confusion_reinterpretation": {
+    "modernbert_base:modern": {
+      "audit_unresolved_or_boundary": 5,
+      "evaluation_label_drift_explains_model_error": 4,
+      "model_omission_after_adjudication": 25,
+      "model_type_confusion_after_adjudication": 3
+    },
+    "modernbert_base:pd1000_eval": {
+      "audit_unresolved_or_boundary": 12,
+      "evaluation_label_drift_explains_model_error": 24,
+      "model_omission_after_adjudication": 84,
+      "model_type_confusion_after_adjudication": 6
+    },
+    "modernbert_large:modern": {
+      "audit_unresolved_or_boundary": 7,
+      "evaluation_label_drift_explains_model_error": 1,
+      "model_omission_after_adjudication": 32,
+      "model_type_confusion_after_adjudication": 1
+    },
+    "modernbert_large:pd1000_eval": {
+      "audit_unresolved_or_boundary": 9,
+      "evaluation_label_drift_explains_model_error": 20,
+      "model_omission_after_adjudication": 84,
+      "model_type_confusion_after_adjudication": 1
+    }
+  },
+  "warning": "Reinterpretation covers only audited development mentions present in the disagreement file; full matrices remain model behavior, not corpus-corruption proof."
+}

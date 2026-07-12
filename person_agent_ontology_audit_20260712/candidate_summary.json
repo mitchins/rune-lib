@@ -1,0 +1,62 @@
+{
+  "seed": 20260712,
+  "ontology_version": "rune_ner_ontology.v1",
+  "synthetic": {
+    "sampled_agents": 200,
+    "sampled_person_edges": 100,
+    "conflicting_person_agent_surfaces": 34,
+    "source": "ner_training_agent_rich_training_ultra_short_agent_rich_20260703_143554.jsonl",
+    "seed": 20260712,
+    "agent_subtype_population": {
+      "faction": 96534,
+      "cult": 16697,
+      "artifact": 34329,
+      "spirit": 12334,
+      "ai": 13077,
+      "beast": 8677,
+      "deity": 6533,
+      "empire": 8307,
+      "guild": 14954,
+      "ship": 5751
+    },
+    "agent_sample_by_subtype": {
+      "ai": 20,
+      "artifact": 20,
+      "beast": 20,
+      "cult": 20,
+      "deity": 20,
+      "empire": 20,
+      "faction": 20,
+      "guild": 20,
+      "ship": 20,
+      "spirit": 20
+    }
+  },
+  "pd1000": {
+    "sampled_agents": 200,
+    "sampled_person_edges": 100,
+    "conflicting_person_agent_surfaces": 324
+  },
+  "development": {
+    "pd1000_eval": {
+      "path": "/mnt/storage/gold-books-pd1000/splits/pd1000_eval_windows.jsonl",
+      "corpus": "pd1000_eval_development",
+      "gold_person_mentions": 168826,
+      "gold_agent_mentions": 10583,
+      "sampled_agents": 10583,
+      "sampled_person_edges": 32565,
+      "conflicting_person_agent_surfaces": 124
+    },
+    "modern": {
+      "path": "person_agent_ontology_audit_20260712/modern_development_pretokenized.jsonl",
+      "corpus": "modern_development",
+      "gold_person_mentions": 2374,
+      "gold_agent_mentions": 116,
+      "sampled_agents": 116,
+      "sampled_person_edges": 538,
+      "conflicting_person_agent_surfaces": 0
+    }
+  },
+  "adjudication_status": "PENDING_BLIND_MANUAL_REVIEW",
+  "labels_modified": false
+}

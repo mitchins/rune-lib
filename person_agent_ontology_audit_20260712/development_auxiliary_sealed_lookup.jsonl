@@ -1,0 +1,516 @@
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "6a01c563c1655bb64fa6", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-6eceadbb5edc984693d6"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "ff417f8645b58cae00b8", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-bc0e8cf4e5c8598202c0"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9739a48dc8639660511b", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8aefa5e3baf1c980f3f7"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "ec22ebf22582292d04c4", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-9ecea37cf2ac614ec040"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9553e8d62cf01f2c9e3d", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-15f75a062c754b3bcada"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "d735a8807208dafa1431", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8022cb0799d4dc461a43"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9efbfcf40bf392e40136", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-fe13af49591c83a4cf2a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "ad02421ac04f93565260", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-0b588eeec24d52780918"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "217bcbe359e22bd938da", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-db04c2c757dbaa1ba83c"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9a17a190823f5b7cedfb", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-fdfa0016c2d1544ceb33"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "4570164d82ac0127ee02", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-c0caac26e2810a42daf2"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "cf307bb9a4a4f12f181a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-c65723fa5fd9b2107836"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "675b073f3a8b40398b28", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-0c84992dcc00cfae0a2f"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "20b4baa333b2ed09e5c1", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-917bbf94b753a291e42a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "27b55344d89ae14ebe32", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a4d701174e2facf7d159"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "35e7736bdf4e4123bfa2", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-f922e7161d23896a7f9d"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "6ca6ea6961ff2ea7f191", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-5e0ced00e7e9a49b7c42"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "73dc7a3578f02a44a674", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3ae294ca10ada22a3d08"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "7f65f8b624a552d3ed02", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-c67c04ef265c2a797f3f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "559d924642eb5b4a23c2", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-f9dc50f0855775fc578f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "13bff768c9aac8e0c668", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-50e82d83c65b76706d02"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "5aed1811b712b2c88264", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-810c0abdfb425ee420c1"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "7e1c396eb3c029238256", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-1682e5bdd9e36403db93"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "d56d0540ccc93fee5c58", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-41003cb108159c186074"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "7746c41e8eef89b702c8", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-76e90c31fd761cf78d2e"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "bfd2f2562528e8ce7d54", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-2e0758be40e2c64b8f07"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "96496ccc925542721e2d", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-4533b4b306c1e545c3f9"}
+{"candidate_categories": ["nonhuman_or_personified_individual"], "candidate_id": "6da85d24fc261ceddb8e", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a9790d58946b3e69d382"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "b6d4b0c8a0fcd9ec28e4", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-b8a8a784cee78c8429ef"}
+{"candidate_categories": ["nonhuman_or_personified_individual"], "candidate_id": "dae0cdc3c7bb39f164d6", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-edc9eb10ddaf3cb835dc"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "19e0c62262b45fd3146c", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-9b6c9d65919b8c0dc377"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "47283662a4acd45ae8d4", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-95f1af229911211bf70f"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "457a320eddda3d044d86", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3b8d356dfe2a530c7605"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "8f72e99f377f8b72cd2b", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-6d0143c6a25435da4948"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "8dba963434acb9005c6f", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-16fe8be8ea9057265cc4"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "5c3d1ee3a12e67f44b49", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-6c9c9eb9ecbcd4d3caab"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1c738b29ade9fd298ae9", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-5226fc9d661424c1b34e"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "e39fcf3dd633a14b5a8f", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a4e12f6df083ef22f1fe"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9d15054daa2a384f0d72", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-cf0b551c12dc1dd18c10"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "5544769d1e24ad74572e", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-00bab18851e0daf69617"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "710ae4cd2191c4504acb", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-1820a345f5979df90b24"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "38844e729acb4d34b5d6", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e1c820cb353cdc3a6b11"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "8622128ed56f753ea6f8", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e5c6c7bf12d5d91e3d08"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "fee6137a3d6bfd1aaa54", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-2e6008bdec5592072e32"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "10124116ff65410a0db2", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-0fd57a8df19b498ff1ed"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "7c856904e51fb26930ce", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d813d4a6991b022448c4"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c4fa07dc1a95dd90baa8", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-9eab6860861589195926"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "3885665eae0ed8e61332", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-2930cdfa6fb7502e9ee2"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "85b5460237ce40cee982", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-eead708af592dcadf39f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "cf0578dd1ba09a087c30", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-cacb4cd57b022f3bcf47"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "2203f2f575b76564bd3a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-402914439ae1ee5fc6ee"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "229a85d8a6a9dc9fecdd", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e928c6764dec14e60081"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "166bb98aaa53b5a259e4", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-fcc64316a409e4a6e547"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "005b3b7ba935cfda656e", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-365f82cba88b3f979ca0"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c6d86065574cb8d47acd", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-ecf35b0e9e445278504f"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "70f4f62de0cfbd692b93", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-75e42ffe22186a0fb9a0"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "2a91ada91fd252e55be1", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-f9ebcb3af783575bb737"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "dcc55ff3df3b5202b35e", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-eb5cb700532a35ddf99b"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "7ccccf8eca155a8b6f66", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d3f9e4a1b3de3d45771b"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "845e768440ee95eb9ed2", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-58d32de6ed14cbb96d6d"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "f63c0b615a3af798a84f", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-74322029d3d81efe5d7a"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "1f21540433af2e7c1d79", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-4da6bbc536e873318515"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "2eb5d8e2653d64c189ec", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-167a64252a9c8d007cac"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "5827286b7b9ea3ea2626", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e75c2234be3d431524cf"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "35851e1b7041930042e5", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d8991d30d7c6b6eab77d"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1231981336fa8230ce19", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-270d9a57c057e1565064"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "397275fb204cce40aa42", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a0b4b9f9061fe1db0e3d"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "14ba77e88f9bb72acd88", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8b9e64418d28b20c1459"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "b4f659d127683aa1bd34", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e169140927d092ef627f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "645a63c0b5610aeedc90", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-575f8212bea012b2d69e"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "b13e3cc341cf68d9e246", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-5e429a5c5fea5bcf9ceb"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "126b5e559c69dff694b6", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-1ac91bf227706ad12307"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9eb41500362bdbe852f4", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-b566a5d8f7223fa65ac2"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "4dbfc62eeea146c1fa9f", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-04fb81aa2b280552204b"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "3a8c5e406ae10b175d60", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a82f93716a2de40dfad6"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "52ce3847ece2544a0b41", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d046e3eeae9045f0a3f5"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "57da4b15d4014d07ec7b", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d836b6efbbae64f50630"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "e5b376055ad4f8bbb978", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-ac52e953641a3805c105"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "ef3fa771ca4d765b2e0f", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-2ff0e812ea1d29050b76"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "cf08b98e39418fc4f936", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-ba2cb431fa94139f27a2"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "5026b046c3d4c2e6d579", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-9956d94f313608e47a42"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "a657113bf9e7b482a4ab", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-053bded02f3b1a0e92a9"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "a9db1931d72219b1a4cd", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-1978ecbf54712ca4855b"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "7922685f80e0628c0625", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d749dc7820604e1e7063"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "aa643e0ae3e0a8ec708b", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-f5e89ec1c77f69118a8f"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "e7dc986927b4d91d98c9", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-6ab5a6f5c25b591bf59f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "fb0d2a82fcdbd2102ddc", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-f75f19f704a4a9edd06d"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "383885eca7972fcc476a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-642798dbb2a26a020884"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "2763395f708deffe3774", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-0ec4ca585c197d4ca8c3"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "acc1f325519eec6b8eca", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-b87a97d8ce1bb30e834a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "08a3125622db5b9734d5", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-bac278f604dcd9917d8f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "37cac24228336704f1b7", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-6a265ee993ae90f0c3aa"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "3eed27a82c054ffe9894", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-60ee2a722d2522430bf0"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "12b5768115adf29d9628", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-7305bf82e632e0a50451"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "4d0359c65fa04fb32e21", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-4ca25e7751f3b4213816"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "38313017f3474c4bb961", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d74ad8f6ade49a631eab"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "93027b2667b55de45479", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-1c3a19883c697c2c45e2"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "2ca4c8175583980830c6", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-176dc1f452393266d0ed"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "575aa1a7c914efcae05c", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e1924e90e2a6bcdc69d7"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "8e829764adfd0f6b1b49", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-64c7a3fe99b1216c8196"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "a6e82cac9edc0efaf246", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3992c556ac1c18235ce1"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "f8002f52f8ae99f53550", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-221eb1fca0a17947d8ab"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "7b4ed77c772044c37e85", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d27ab1a6ac6b68f5b6c5"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c861c32b894738b3ba86", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8cd05904e0c232695f7f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "7ca0561ffa485d7b1d97", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-50fda0ef5c9ba87755b4"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "b3a2bad9a1b27f799b01", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-40aaeaff92c95b25cdae"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c610975609ad0348b235", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-47c2accfa04212120b9f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "e767b8c971a7194ddb0a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-75418fe3429c78be6aa7"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "258c475bac6e51a411fd", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d71d4f1f3d8fec906e62"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1777c47c264008a97279", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-c01d48e57bf6d1b423a4"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "07281985ecc1e4ff4e90", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-7f68911cb7d86667a2a7"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "90a0ac1abc715c509f35", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-61dd4d4a2a6bcd50147d"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "9fdba354c14f282813d1", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-c966bdec6aa780796e43"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "a925c75dc1366c9fb1d4", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-88e2e58cd079520ba183"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "6191f8fd740b31463f93", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3d03f24304acd4f2393f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1ebc583b7160cfc0c283", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-16d6b6cd056ad235414b"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "17851b84d85a4395e041", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-6991c828b90bd4c6b3a9"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "49ed05c8d09b31e6e4bc", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-224f6d32143545e619de"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "ddc68815b85c01c07997", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-1706767e1865becf38d2"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "f34b13ee6aa8f4cb2dcd", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-dd97c1cd15d330e5f61a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "021b17fa8facedae3720", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-0b32830d8c6b913c9b51"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c6b6034a22c51b2f3166", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d9b765899ba9fc0bb9dc"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "debe14e1a8f067111288", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3f3cd4818a69c07f8f78"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "255a40c23ed6f4038fee", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-563ef0a3b3a5b25c02be"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "3d7e0585964b28d1e1ba", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-22d1ce8869ffae6b933c"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "a0442a477d8d2a0837fa", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-b4c69a78522b86c04eb2"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "0c868e656dce53fa6388", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-310d684358d436339f4a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "80ae640b86daa1b722b4", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-ab49b93375b41af4d9c4"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "e4b8aa8cfc097e39b1a4", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-579a60512fff46f18e41"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "48a946b2648e6b71d248", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-508349b69aa1677f4ac0"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "4c1903c0fee7e4c81710", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-613d91edc1f16ef2ede8"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "877ae7941df336723d8b", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e85101c3faf593d5637b"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "436fe944057594cb5817", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-b50732ae1c343cfb9bc4"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1df4f4c6d726102bab85", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8d35397152215a0f0fa9"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "7e19da7f749019a27286", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e80e8dd56a9ea3279f0f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "6697edcddf20164c2966", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-9e578a8b26271d829fbc"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "1c8ea6b6e1490ce66b10", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a313fd56df5bd986185e"}
+{"candidate_categories": ["nonhuman_or_personified_individual"], "candidate_id": "ade8dab507a9946b9b95", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-be0bc2c2d72d21dbc992"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "ee6e3de28957270efde6", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-643832c55806e61d277f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "e66aee6246298133ca44", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-5a25a113d678ba822a03"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "dc4dd9bc6323af88b343", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-f83cced4b5e013b2e132"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "221649b93aa4906ab7cc", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a4fb47f8541c4daa240e"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "9fc44a2c2cb03972dbb2", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-bdb29cca193525d7f43a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "4e4d3ef0a3bb768e5009", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-cf472b35bebddc8cf358"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "afd1b11689dacf400dab", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-6d78230946b3916e0c21"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "23b76bbb99c9a2a7aba5", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-43992dc003332dc53ea6"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "7b1144205e342bc9323f", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-87f4d752adced6000302"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1a7f3dbc2cc9553ec18c", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-9c061d8b973a11deffab"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9ab643490d48538b65bd", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8a2657d500cb87a3147e"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "74cbf8a29d7ffd982629", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8502f6c086265c847fbf"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "3d9b58395bb0e5ca1cd7", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-74828456e4312a962085"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "7ae0f21a398580df754a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-cf756b9804a92c77afe6"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "cb0db13e50b23a891998", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3099d3b89d018527cabe"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "caa10692d8ac8ba9c58a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-4a5fc0f6ec8b91888d57"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "f8b0f71469fa103573bc", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-4aa3119fc43a2a345002"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "800c6808dfd56ef5f333", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3323929c45ed75d82202"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "ff5cd8247928a565f257", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-278a78b42b328aafbaed"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "b63d6f1e8e2b992ee8d1", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-aba54e8d1d690ec7878f"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "c3acae69796459e919b8", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d944252052590e5fd2c6"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "41dbddbaf0c2cd54e5f6", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-5501d49672f1b6300715"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1323024ba17ea5eb5afe", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-ba8858997600a15eed65"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "b256ba332d3274d7c23f", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-90e738a90730c9ac50ff"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "80627169b6bd23580f1a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-681f1fa621120718dcaa"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "a5183ef6b519c3be5a97", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-986b1eee609d011aca9a"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "092bf5001161a6ce31d9", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-47528a4c6509c7d7a456"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "68b386e8dec7c98b7708", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-66204ba809cf79384d4c"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "ea34ba3ff4661cf6e663", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-801548baf1b64d33fb75"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "e398981049451b571c0a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3c85eecda7f2c29b0c76"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "8c9aca9a817236af7d26", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-32f85d7f134918660336"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "dbb16cae72bbeb7b0af2", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8372dd928af81e36a27c"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "f39c15df7d78294dcc0a", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-278454e88a20397ce397"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "19624c415c5d3c7d3fdc", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d337d6591bfd41c9b7b0"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "914abcd8557cc0e0f7e9", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-8644458292d6d7cd53dc"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "82414ebec198d3bb0004", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-62070c99cc56ae773342"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c16dd81ca2f448f94932", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-b087b61a28e97db16e48"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "e69dd4edf6e59df310f7", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-ae3512ea7ff0305daf5c"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "4ebb13c417ee9e053b4c", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e328b6bb617a21a4c4e2"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "80f5ae0a15fd200ef2d3", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-d7bfd216baf058f8ccc2"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "38a3243d3c7dc528fe33", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-6cc9d9da9f0b6c335a6b"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "00860e2148d9ea52e7e3", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-343e4ea6195e74eaef25"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "aca9868bad968552dec7", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a9aaf95dbde2b76b918f"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "a8bc923aef1a1467e4a1", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-1c57b7890b5032ed36cd"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "d1143f3e4e56f6ba2c58", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-db59fab8b2a891597327"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "e26871c4775f56d7ebc1", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-7d3263991134d6a23bfc"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "4a67655e425f1db17cc6", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-ce508b953fb1f12bcd85"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "cdc8b591191271862353", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-c8f7c551b7678d6cb798"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1e407a990bbb99a0396e", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-1fde97700cfb1d5de868"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "f1fb9a51843553d05787", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-e57b12432bba5845f104"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "dc086c3375006a068102", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3c68452b5fee0399cf63"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "033876519f283065dbdd", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-dab9533e686da5d17ffb"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "eefb0e1887eaedd251b2", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-461e8296aec11c6c0839"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c66f87b8b4462492f69b", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-343ba26e12008c1e9c4a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "57bedda4ab0e76f1e368", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-f2c2774e529a9d8787ea"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "632f7278aa00cce695c8", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-3bb50dee8fa0318efffe"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "da090b7fb02c13be6a86", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-9d81e4583b6760c08c7a"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "b96f0c7809ae3c67dcc7", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-bb6ff5580577ad4a4d70"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "2dd102454de4a17bd0a7", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-7b25edca1528e15a38d6"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "3c3a719a31f35584504e", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-dbeac11a16c5db40cefc"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c5ad80e2c62c8e71cd98", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-a12c6bdd0eda31568447"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "b0f234a3bfb6f068284e", "corpus": "pd1000_eval", "current_label": "AGENT", "record_id": "dev-2ccf9a829920121ca700"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "a179efdd0664237d5fb0", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-7d49d9072c3c0309fbef"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "4e6fcb291ea93a4407ad", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-b8904d410d26612faea5"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "4b3edb5d486a6d6213dc", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-21f40fb9b2b07b5e4e28"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "dc7ee62879186cb6ae37", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-622bf2ed08190ab7e3a5"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "d66bd61a5c47b0d76512", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-f055591954ecc2f32f7b"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "b57f0e0fa4641b50d88c", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-3d606f30217ac50c01a7"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "186ae49e0b391a4f4e4e", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-271c3d74bc28a67e9804"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "collective_or_species_term", "person_edge_case"], "candidate_id": "788a1d232855646f2603", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-61d1a406d54c147021bd"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "1f1014ed81958a2e537c", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-7f4328ce0767afe5c73d"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "eeff6fb13ddbf76bf46d", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-41a6b1b19e1449b09f50"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "56330feb20cf4cdeedd2", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-04ef89453a5b6708c345"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "337d4962ac513852d8cc", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-02b9ee7fb0182cff1bc9"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "33594f27a7bc1e29f8eb", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-3ecc564f985a5c0f7bb9"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "76e615a8683a11c94962", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-e056fe138933d031c47a"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "756b7ea3a8b8922c3eda", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-bca1a43028fa8eea6005"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "d23bb0b1129aab25844d", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-e830e5f1a7d054167077"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "6c703382f631778a38e8", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-eccfd75e758efa691a1b"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "b15abe17db8b489ba6a7", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-b67408be270311291f27"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "7d6f5827c0f0d727862f", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-c3cc33bc8b008097df6b"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "5921148051412d2189c3", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-d83ff01dd4fe452dc5c8"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "d847e51c52afa16c5496", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-900e8457c73a4382730a"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "4d070d700d2846950b0e", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-51b64c075fff03305ea7"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "4c2800247c09530861ff", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-a9be0369199dccb8012a"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "a36f15eaff8c3450d8a2", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-839e6df830f41dfb0588"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "1be7cad8bcc0d36256f5", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-754581f2616911a416e2"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "6380490c47bc31c790dc", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-091d2908b0dccb8d07af"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "0abc137c92bbe2ffc63f", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-8d748d13e31a4c77bc73"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "af88008b85b17e3d1d5a", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-1c8f580ebaf09fb30656"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "9e0f3efcb785b8ae4e34", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-6a88acb35a460a3000ca"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "794a897a59f7c119d2f2", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-f06eeb8303179bec2993"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "3f653dc00b7e48dd644e", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-ce2e09826115d5d8d06f"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "1a28a09f2fd38a7c7503", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-fd895d7dd4884a902d3b"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "28497b9323353da5d8b2", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-e5f5dc2bfacac584e173"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "e67b311e9514c6343b59", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-4fd04210c7abc3ac7a81"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "b61dfbf5b65fa27697d0", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-e037739b2f462b7f96d0"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "bcd76575d8f1c91ba9f2", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-286b7b92a08a682d51bf"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "b87ac7d98bd46b3ccbda", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-4f1be29c082c73c2465a"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "16d0e66a567a4ab50544", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-162cbd4d22ce38bad785"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "dfd7f9ce4e8057b478b8", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-d58000793e0e67673ef4"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "eb33f107205a26d5550b", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-d347b18408e5c65c1135"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "8ec7559650c06088c0a7", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-6683eae7c6919efcb7af"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "c5b3843a19fcc8530dc4", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-3781a2ad829acdfcae0f"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "4a14f9806a5d3b4a4394", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-2450c131374d32aa33a4"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "48a53c2635ba2b550ed8", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-2d5c8d50f22ba235130e"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "173b4d8976d4a1ef74b1", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-f9f75c447856c990fb46"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "6b6c887acabe72253b0a", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-e34f90ae8d559ddba791"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "6ac270cead870e444502", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-13de20ea7ac6f72ee3ca"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "9658adcc9533276a809b", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-ecc859353482dabaf6e3"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "b4c1ff2a12dd009ede81", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-207ea84c089fc631ed27"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "8e0065342c635bbafc5f", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-6885518cdea05cbcd1e7"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "54192522e2724c4ddd41", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-9cce31f4fa3ec4ec4ac4"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "collective_or_species_term", "person_edge_case"], "candidate_id": "877c16dafd485a98e770", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-201ca1b0a0bd3b2b6e64"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "b493eb9087b92a7f5088", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-411179b482efa05b74de"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "42629f80db81b3cdb658", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-1525d3bf8a6f2c5983a6"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "c2afefeadc659ddb4d71", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-b8bc8fa9e1069daaf004"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "85c195afc120273bd536", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-b899179c059dea3ed623"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "57c04644e8b60907592c", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-afd7509f4e2b675d5e0c"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "97a397e45b4a0b36335d", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-4624bc6814f1ec7aa5d2"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "30be61e34592421b9ab6", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-30985079accd6822425b"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "7f1f3b1d4e79447abb4a", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-1f37844d07dfdc0beff5"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "5fcc1a96710a108fa561", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-a941f025ea385f99b938"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "a9c1a990d769c71f5d4b", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-d88edeea18059011d5ac"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "1a8a68f0cb111c7d074e", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-96371c08044745bf870a"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "5faf3d8773f919c7de77", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-e5c4517c62cae821a660"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "a3fd8f21d041e06813fa", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-65b27ca17992cbded06a"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "890d6a8f3bb598293cb4", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-228debc69e383d47a33d"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "25c7fd705014d1e58bb5", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-5a36db19266bf94c9f9a"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "c970cfe4f06175777e77", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-00c416bff69bca2ac01e"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "a647f59e357683d995a3", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-34e2b83a50ac1f626d1a"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "ee1e6634b76aa649d2b1", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-5419ba26c5a5c41a9880"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "b7507b566b1be836a4e8", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-a2e911ae47015f4a2447"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "3b9e02f753fc093db0b2", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-c63a9c2eb8f10e659d83"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "ba5a20172386acfd6827", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-4f1babdc11125c8593c2"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "10a995978a743e702b52", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-9e58a818c4c20c0f00c5"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "2f78b984284d4da9f9d3", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-61cfbefa152129f2091c"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "f415f320ea83f24847f5", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-13a0e3946e0436a27c0e"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "d4f96095b631063f38ad", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-289894375644e1dc6673"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "f435b50137a5cf1d9287", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-aa85ef872d04ae782c60"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "057fb904c82e22a9cfb1", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-4c1f3efe47eacd2ffa39"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "collective_or_species_term", "person_edge_case"], "candidate_id": "bcced35e24f29b35f6c3", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-0473881b28e625ee5ba1"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "cc07b38483ad9693dde0", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-ae30c113c407d46607c3"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "fc1c99f69e6b2d2f2ebb", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-8aa575a98d39e13da3c1"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "34f7e2ff6498cb988a95", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-f7c2f1e7e995fd84b2c4"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "27fe3a5b120602986623", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-78c0b1d8cb04673a1337"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "1473a8f46699c6dc9bcb", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-92051dbdf9dfd9a03134"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "7fe554ea7dc538ebf196", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-238624e47178cf630104"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "8fcd32670a5fad32f46d", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-6f23789c5f7a1711510d"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "f323906d64f1a5ae9662", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-348f0f9b413809740784"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "40276c2e1d4bbe550fee", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-9e36fadfc5e6e1084fd2"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "cce48d275d1cfdbe2e0b", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-e93bb728a0f1a58d161c"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "43c893a5047e8289691e", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-7d8c1ca8a2a6bc465e05"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "bc76c3f51aa4815b5844", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-5d9c07f75cb64d2f2190"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "a0ecc8a7011aa0202540", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-56ed0020eafb25708264"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "63837e3b35de19b96ff7", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-4a9902eb33de409cfd5f"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "be7936f6ed2ef688daba", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-614eef2894f9bd844edd"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "b52270ac9182f4760e81", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-dfc305a5b6545fced1e2"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "fedde5a29a4f42626232", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-6d4af823d12cee0ab967"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "5455f8c5f2ac8ac0410b", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-a4e200afa89ff834c598"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "6333c9ab7a3a94724e19", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-f8f5b993a2fd47665d23"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "29a509ad66e94c5ba8f6", "corpus": "pd1000_eval", "current_label": "PERSON", "record_id": "dev-4acaf5db4d1d25b7cc68"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "3d33425d48a6dd9b492f", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-67a293d9271297715760"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "231dc1f61b4ab77c8f69", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-6099f72440f4ce97fe77"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "2a6a520e52e71316ae03", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-8073330c46105227e542"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "7dfcac6e400d2ee9376c", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-3e9ae721dbb2da3c4644"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "a39aaca7491a992d1dd8", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-3daffa84796060bd503e"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "aeac3940123be22e241f", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-0aa208d8f60e576989ac"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "d6f55ca9c166aa47115d", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-58fbe0ed5ab36e2daf60"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "457a4463ea732a561849", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-8fe0ee0b25e265043ae2"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "4c2f06a39e5444fbe703", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-010e14286d92b3f363c4"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "13f77259efb36745a162", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-91dd5258a54a79be5fea"}
+{"candidate_categories": ["nonhuman_or_personified_individual"], "candidate_id": "23eee96018a099c52bdc", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-0c72fd76cb8dc284fc67"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "a387225be4231bf170de", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-4f6d39d862baea03b0a1"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "bec69719b8126c084ec1", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-35e6f479510a9497c7a2"}
+{"candidate_categories": ["nonhuman_or_personified_individual"], "candidate_id": "ed08f549588f1a92f475", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-63557522dcf1d82c3ff6"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "0182da0b4d3dd50763ee", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-95ff52fd66350bab77d0"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "1d7c4b8642fdfa1ee070", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-30c5e279a7e2e017909d"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "d3dd2ea51d071ce58ca9", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-97555c588982ba8895d1"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "56acbc7e052048066fb3", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-daf8b4d2f57865ee2076"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "ee863d16d15799374bbf", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-5650df7a87040782fc1a"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "709571e1e79c6334324e", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-482e3a9facf08a104ff0"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "a80e47bf8c2d89a28544", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-eaa03cfcf1bb8ad716bb"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "71bc6a93410b35dd6b85", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-65be2e9722603e2bca16"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9525d2e1b1d8f2a801d6", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-125525b3f595d92afda5"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "52dbaf02ecc0d14ff99a", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-d3f2014ab8ebae7237cc"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "6c05481aff7516ceb72f", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-1230dda5b86bc22a1ffb"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "39edfb26d3622e7e602d", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-fff7efec553f353a6e92"}
+{"candidate_categories": ["nonhuman_or_personified_individual"], "candidate_id": "298ffa11547f4c053145", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-22de75be549b9ef4e493"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "e244d457c6a1e95348aa", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-eb8466f4457233112f4d"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "04b01f3bd1075c6f2302", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-a202a7ba9efe3b03914a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "ded83a0b57e51c0a700e", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-ec865411fb3c076c6289"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "0046dc8465892c48798e", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-90af0c5fd43b7a9da41f"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "b1c477f97ff2b37d3b85", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-628def1b709777684046"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "8466ec81e4bf6e6ca8b5", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-f21252a7d5d9f1c36bbc"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "c55effab559ecc1bdd75", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-6764f3f73553ce28f608"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "be625b0809c4ca4748c8", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-56108ef21f810cf0290d"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "0beab82d4bc0a82a98ef", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-0b8af3cf45f966fc057e"}
+{"candidate_categories": ["nonhuman_or_personified_individual"], "candidate_id": "c073515fa3195bb70b1c", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-7c6d72dc493ed3cdb198"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "7e111af72aef021f5190", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-efd550db9b041cb12797"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "6ce35363c9221f1d1bec", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-e4207933db373f162ac1"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "2b65ff7bdd858e94bec8", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-f235a87b3b077f65cf8b"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "715b06ce9ce161d78513", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-e5d9a6960cf35e17d541"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "dd1f2dc2f03ad5652066", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-aa3b6a5647fc7fef3d8e"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "f8ccaaacea3f22c8cf41", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-553b6da7b8ee8e4d9f40"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "37d541a61d8d50658fe5", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-a3e9813911475d451451"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "a451dd9b97a1e212dafb", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-743b7f2d36e8f4b0e263"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "eb92612bfee6f46ecf6d", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-e2a04a285fe59dd790ee"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "5a23a28afea164b389bc", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-d1863f6655153a890a50"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "4882a255760b833022db", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-27a7530001da847e8281"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9e97c9b44493a51bce61", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-1795920ebf9f9622e6c8"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "7ce1f22c1b47242c1b98", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-3bca0402cbabbed48cc5"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "b035bf81471444f24580", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-578eb56554821068ecbe"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "336c218bf47557cf3d88", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-99273934e0182bc1441f"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "4bb0c867273e231c4b1a", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-ba69eb976b18fcf1849a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "95386521b8f195d1651c", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-f58fef4234811d59b333"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "834c56f7e4bcb8503531", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-eeb268424d985c3e433d"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "e3254cac4402b8f5b720", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-dc4daa0c1072d5d92b21"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "8ec9cf0727218fa677c7", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-ddb728f3f9c36cf30555"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "89ffdc2ec7204860b64e", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-9dd30e3facbf2f3051f0"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "f4682b2e58b30508a8c3", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-8d3bd05546212bc3cb86"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "070d98ec87bfe95112f9", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-836ec46ea4e726762f1d"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "782f6729e402bc71a506", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-b180156abc3994309050"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "b8c051a00f8536a85f28", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-23d0c5aa6457e7d51348"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "5166b2030833bac09b8c", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-0c467f2ae306b5e4d886"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "8bf7c595032f6d1c6e61", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-5d9561579f1ae424a02b"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "6b0274abb83242fb2ead", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-30088fd8246271ebf541"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "8cb2f872ac47156ae748", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-db91b13b48ec6f66de1a"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "aebdf1f1aa816a4b04cc", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-2c9268e282ff9ecc76ad"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "83e16a3c55e037c5de39", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-aba9654315056f1ada6b"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "4c60dc5f8e34c031b951", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-10457217a50fac3501df"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "dac11d4bcb375013ff98", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-0cc6155a8ecc7ab5f9ad"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "7bc05c6cdb031547c12d", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-e021b1919b6553260abc"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "bece1ae68cb9471e09a8", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-f13bf7908a9b5e5f0e7e"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "2307bd1203fe642bed5b", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-3e2669646c8ca6eda2cd"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "4972c9f6a0e1ececa7ad", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-c897e1ad9b1254389432"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "6778c752df6368d3dba2", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-abcb86789801c3993231"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "6c40895a7c6d2d8ddb64", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-e98b363c517a04598eb3"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "dc1526482bf0f2a4413c", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-49e5b379bb374afdefc6"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "4a61867862163345fbcf", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-90a1a75ff583ad365f09"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "27cd12fb31b6826d1eb6", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-b03711ad7cd4a7d76a35"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "0642cb708c8284bdbc92", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-36b7ce362d0c4378896a"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "7ffd14cdf4b6539d2036", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-33e6de602c952dcfad73"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "44627b34bc8c1fdb11ef", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-6a0746bead32e09ee0a3"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "af8a33db8305d228f86d", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-c951cf9395da0cf682d7"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "f5df320378c2c846173c", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-b9bcec2bea267042d06c"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "de1067359ef30e177678", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-0b2575e8991bde946ed8"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "551d00890a76bda159ed", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-6fc8517f0737dac56771"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "72a19df860cc131df49f", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-71f451c5436f33dd6a19"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "367776c32ab4dbcdd895", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-993a98c1fe1a7cd80af3"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "27cc073d5f025c603fa9", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-7438046419f279444395"}
+{"candidate_categories": ["nonhuman_or_personified_individual"], "candidate_id": "d3ef87242ce416403760", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-2485651bd5436b5eda45"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "2190ea3b806c2f8de21e", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-765fe0ec752ddccbb7e4"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "13a573ce408d8b1a821d", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-78b63c756e0f6c20bdf1"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "1e478f0dcb6a52ce931a", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-7bae431d4db5ae556156"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term"], "candidate_id": "ed30e87007e1604d3950", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-2e4656a92d1dea6df2aa"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "ea7a0a878eb88602dc87", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-483b20530fc02cffec35"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "35db0d1cc9b185fd5ddb", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-4ff98ef208c2769760cc"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "f2cfea4180a5c09edb83", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-55af9c87775023138589"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "523106b02261b4243caa", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-83e5158e9e0806621593"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "64ce8184375dbfe52bd6", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-71b997b88a3418fbc921"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "d15bd5fcc96e6a6ff646", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-4dbdecaa12d247b4347b"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "aaa6eb3f944b4fa8d643", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-f32cff8beb0c21674c1c"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "6fa70cc9400c73af9214", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-03a117f76427c57e7f6d"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "07ffedae9bfd18bf473e", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-d9052acb1fdcfacb88a8"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "62126e436a7c0c094e9a", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-1c345ff4f49cb247706b"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "edb48dd6c565abc4bc51", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-05429af632356f893c6d"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "d809c8043290867e2928", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-af64f561a1e56c19c08d"}
+{"candidate_categories": ["collective_or_species_term"], "candidate_id": "970df9eba82d87b4e16d", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-409214bb87f58710c4ff"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "96610d3d1ed780e72c6e", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-ab93c025947ae98e258c"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "148bd5d455c19c8c826e", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-3673285e20800208e815"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "92108a32d3da12f8252f", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-f390db12f0ecfdbb3471"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "9a0976e365a99b236b49", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-70411e57687ce3445c97"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "bba30f60aec95a763a1b", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-3f02e3b35df28ebc35fe"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual"], "candidate_id": "4c64a67ffd5752f4adb9", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-41eb44dd74ccefbf1dae"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "c43918cb7b09e286a5bc", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-a4905b8c2aeb7fb6cede"}
+{"candidate_categories": ["untyped_agent_random"], "candidate_id": "92fd8f20516fd117b4a6", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-d4442db193857477f041"}
+{"candidate_categories": ["organization_or_institution_term"], "candidate_id": "91aa8fcfad66b6498e7d", "corpus": "modern", "current_label": "AGENT", "record_id": "dev-5be29c88d24f77b7fc50"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "d4050a8189afe5dc2748", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-a6f2bf87ce2db5e9d00e"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "b65a5686d6fff4f07dc7", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-fd01c93ffeeeff27b293"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "ba8b0b1212f06e69b9b4", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-5c1fc9439bfb90e4e137"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "6c9c544686bc1676147a", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-501f69c8faf90b58714f"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "1da1a2d7bb6e56a022b9", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-ce1e8fc04fc5bfd30464"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "b0b7573d8bc4d89e6934", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-516357e439d1b065bee8"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "ff044ac82a18db733cef", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-cd916dc183f3d89a9c51"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "291c1e510168c90bf468", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-38be02d7df33ef55ac38"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "e6f772a59f7e06cca051", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-5ef6e5fb4fad05a5063c"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "027ddfe39a8ff295f2fe", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-c9d5b27bd3e89f92fe63"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "2ba99ad0a8b0f7da907a", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-deb2c8195421a311d09c"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "377c5142c10d9224c6bd", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-1f513566bc26fa5ff77b"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "0131fa171a921e2b4600", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-2ff9a5d857fba3440fd1"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "9d620cd7941ba159ef26", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-7e7654c231d7545129b5"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "0071bd101341d3ee22ef", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-4699c2cdab28f8759560"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "e490d9325ec4ee45aadc", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-54afe7d8fb4eeff6f91a"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "eb9aaaeb9da21164f3ee", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-5da24da213690fe35a18"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "98734bd3bf478e429232", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-f25280596b624d57a3d9"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "e7ccde1db4eb24b2c895", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-5b1ea38bf5e0f8feca9d"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "36b53bcba4f72dc4c3e2", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-886e87b31fee34ee730e"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "fbf2440bc54d30202284", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-82460e2a435579a8f6d4"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "7201905b0e0703212b1f", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-2bf28abd56ee123e2101"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "6d3ff5b6c732d2ab7894", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-1d69c329fa517551ffde"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "254843ca95127890618e", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-c70fe46d321b79ff6c61"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "8ee387222b73a290deea", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-49c67edb0349ec25d8a0"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "1807470cce1f9aae0c77", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-ca85bb9c1a2bf26562d7"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "061d8c0a521d46f2cfc7", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-057927c95c8847881377"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "2fc1df52a158e042935d", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-87cb9a8a416f30c9e553"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "979a2b1974f1db27b0e2", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-d109f44114b7d1dd2587"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "cc09980db0dd0606378f", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-276061bc1a9457340141"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "8d50b79a46fd39647b36", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-2d4fa1a1b13ccf20696c"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "2a61ff9c193564331b53", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-ca311688665aed3c60b5"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "cd16035ef2a1f3ea6d65", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-0f2f20d65793c17d9fba"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "6ec3788cc2ff99bb14f9", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-10ba9f9bcd12c2070566"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "0179371ed5477a14cf5e", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-75ad2250fc5fa08ce859"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "8c846c4ba221ed525c32", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-90ad3f73ac665fd5af6f"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "c01470fe898fbab8b1d1", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-101960ab7eb0d52492fa"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "c7ac427ca618c87f2a11", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-f44f28d9c1b16cfbb15a"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "063dae24780545be5d5a", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-e9eda94c6f6ddf3bc8e4"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "83f0489274e002c38cf4", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-20ab3fce9fd6af96883e"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "3dca47514e66069025a1", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-d7b251bec8354b9b26d5"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "064f21c84f3112b71762", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-5a79edb6e67bb1fd1bf3"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "43bf257e90ba2843791f", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-f8d87d80f1af220a8f53"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "169d2f1bc8e15a4d85ec", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-1800b7f3499d6265c03a"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "2c25e7211083325df70f", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-eac59e45779b52b91fb7"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "43dc2d07770a093ddcd8", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-c58cdf79ecfc8f12bc14"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "e408729f53fa7b65b76a", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-7b9c3c331d4492df41c4"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "1799457af61cdf7acf32", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-1e124faa2d25e35ca167"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "aa13def2322f07e6bd83", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-bca8cabf49da9187680f"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "4e224195ef945e1bc09c", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-86074d30b2d76804ae66"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "8caa9512c535f06bbbe7", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-f2356ba5d8d5c47da69e"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "519fad4c0037625d4d95", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-90ddaa296a47b7540b3d"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "a5862db4b0c54ddffc60", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-41e1bf612a9c909d1d33"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "372a888fb0285be14fde", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-b2336571b5dfccd735a6"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "8c931af052da74214e7b", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-b166cd4c53b86e7ccfb3"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "9d8dd57d41da29752de7", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-57ebb8d380f6ca727d1d"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "eceed906a61530691d6a", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-bcfefbf58d2a684c21e7"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "e8fef153ec28576874e9", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-3f7643f4dd74839fdc65"}
+{"candidate_categories": ["organization_or_institution_term", "nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "c6872eb2b432c1556617", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-6a6d6284cdbf4f5f537a"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "fc5c1ddf448053330f05", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-4dfd1e3a8c6b0c609f15"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "3f0ed38ee85997e4855d", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-13c50a3469a3b595efc8"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "df1e0dc98f62c3e8c9d3", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-65c37c5da8e31acc5a58"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "96d609052a906071fc2b", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-dd2041c51f64e1becab6"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "d79a38357ab7d11f47bf", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-0eeb9d02934aa8cdd5f3"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "1232605ba1f0399fa357", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-ea5ece9dbf91de034b0f"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "1183e6b3bde67346e91d", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-83edbf38dfe63df2b030"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "24034a76f169351eaef9", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-758151884e6ee082efc4"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "collective_or_species_term", "person_edge_case"], "candidate_id": "ce496c9c89da5c7ec388", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-453af1e55f0c6522d19c"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "8e1c1b65fa4438bfd91f", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-bb254bfa049a5a4d3363"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "7098fab0121052a845b2", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-bdb4d91d9ff04c1a0fd7"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "94b0dec0bd1cf32c78df", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-87b4df19fc014fbd300b"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "07cfbb1de854a4f670c3", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-e62eb36cb85253e9f118"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "39432f901f7799dab426", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-fb32ebb326489eb9227b"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "d1ab79b6fff916fac10d", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-4747e094158aab5bb2e5"}
+{"candidate_categories": ["organization_or_institution_term", "collective_or_species_term", "person_edge_case"], "candidate_id": "986aba06dfb1cd602141", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-c1990ecbb0b8c20e9cbf"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "d459aeb1f080bb45948e", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-f2c8107acb588e9045d5"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "76d7f150af33a83a0721", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-87c764a1ae5125fc352f"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "f1cc455bb2a911032bfc", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-d16c240374da4fe16dc6"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "e75c1f1bb0e188e7f7cd", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-7dcac5e39a4403bcb320"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "15ff4d2a558893b43772", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-858fb8d5d58afc95d2e9"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "702ea5508f2ae6b31595", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-7823d43edf3a0ba8449a"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "f645760d82d57d32aadc", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-12b8837ab8a8878388eb"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "67c2187e4ae267d1fd02", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-0b95900cbd0bac594e05"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "433b0f23ced8fd8db9c1", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-3b1da641b31bee386141"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "1dc55f59cdba947793af", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-6b252abb39dd6a9d17c1"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "189724e9f5629e7b1c9b", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-8838b69700db1beda9fa"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "a92d8de748674ccfe591", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-e24954e7003a61bc968b"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "cee58dcd189466c1b121", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-d6bd4c6c39735bbc1808"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "615f703f5986ea995eff", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-36f267fd987bd8e16177"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "95017e1d1541217df922", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-7be9960295bc6a6b4d77"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "7103dc96ab6df3fe7baf", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-ddad4af3cf95a8e12ff0"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "93f2dc180daba7be62ae", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-c2735aa4eec1137e39a0"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "a55b04efb5d181621d40", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-1f5059a526855dd9d532"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "b07fdb2cb8210865ef91", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-418ae38ec9abf6f125e9"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "8c479300a704a2c3fc74", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-6036fd77a4acddb8b016"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "c06e8a641ba44d1b47da", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-c36fd0ed08ef9bb62736"}
+{"candidate_categories": ["collective_or_species_term", "person_edge_case"], "candidate_id": "03200389ba17bd6b6436", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-d524b5e6fc23fcfdb1d8"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "8ddd7658183a22fab321", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-1e52a118009c05ce0ef4"}
+{"candidate_categories": ["organization_or_institution_term", "person_edge_case"], "candidate_id": "06540ffb47f056d625c7", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-6f11a1995228f71966c6"}
+{"candidate_categories": ["nonhuman_or_personified_individual", "person_edge_case"], "candidate_id": "d40b2119b7503224c11b", "corpus": "modern", "current_label": "PERSON", "record_id": "dev-e67979abb05aaab56f13"}

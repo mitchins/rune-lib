@@ -1,0 +1,192 @@
+{
+  "actions": {
+    "pd1000": "RELABEL_TARGETED_SUBTYPES",
+    "synthetic": "RELABEL_TARGETED_SUBTYPES"
+  },
+  "agreement": {
+    "agreement_by_corpus": {
+      "pd1000": {
+        "cohen_kappa": 0.836823497416372,
+        "n": 75,
+        "raw_agreement": 0.8933333333333333
+      },
+      "synthetic": {
+        "cohen_kappa": 0.8646616541353384,
+        "n": 75,
+        "raw_agreement": 0.92
+      }
+    },
+    "agreement_by_declared_synthetic_subtype": {
+      "ai": {
+        "cohen_kappa": 0.5333333333333333,
+        "n": 7,
+        "raw_agreement": 0.7142857142857143
+      },
+      "artifact": {
+        "cohen_kappa": 0.0,
+        "n": 9,
+        "raw_agreement": 0.8888888888888888
+      },
+      "beast": {
+        "cohen_kappa": 0.6111111111111109,
+        "n": 7,
+        "raw_agreement": 0.8571428571428571
+      },
+      "deity": {
+        "cohen_kappa": 1.0,
+        "n": 6,
+        "raw_agreement": 1.0
+      },
+      "empire": {
+        "cohen_kappa": 1.0,
+        "n": 2,
+        "raw_agreement": 1.0
+      },
+      "faction": {
+        "cohen_kappa": 1.0,
+        "n": 3,
+        "raw_agreement": 1.0
+      },
+      "guild": {
+        "cohen_kappa": 1.0,
+        "n": 2,
+        "raw_agreement": 1.0
+      },
+      "ship": {
+        "cohen_kappa": 0.23809523809523808,
+        "n": 8,
+        "raw_agreement": 0.75
+      },
+      "spirit": {
+        "cohen_kappa": 1.0,
+        "n": 6,
+        "raw_agreement": 1.0
+      }
+    },
+    "boundary_error_rate_final": 0.021666666666666667,
+    "cohen_kappa": 0.8550924648081698,
+    "disagreement_rate": 0.09333333333333334,
+    "expanded_context_rate": 0.04666666666666667,
+    "insufficient_context_rate_final": 0.0,
+    "low_confidence_rate_all_initial_reviews": 0.028,
+    "overlap_fraction": 0.25,
+    "overlap_records": 150,
+    "raw_agreement": 0.9066666666666666,
+    "tie_break_rate": 0.021666666666666667
+  },
+  "development_rates": {
+    "modern": {
+      "ambiguous_or_insufficient": 1,
+      "boundary_errors": 7,
+      "by_current_label": {
+        "AGENT": {
+          "error_rate": {
+            "ci95": [
+              0.13595102656280073,
+              0.28429533461609774
+            ],
+            "interval_method": "Wilson score",
+            "n": 110,
+            "rate": 0.2
+          },
+          "n": 110,
+          "transitions": {
+            "AGENT": 88,
+            "NEITHER": 5,
+            "PERSON": 17
+          }
+        },
+        "PERSON": {
+          "error_rate": {
+            "ci95": [
+              3.469446951953614e-18,
+              0.037719990121680605
+            ],
+            "interval_method": "Wilson score",
+            "n": 98,
+            "rate": 0.0
+          },
+          "n": 98,
+          "transitions": {
+            "PERSON": 98
+          }
+        }
+      },
+      "sample_records": 216,
+      "semantic_records": 208,
+      "transitions": {
+        "AGENT->AGENT": 88,
+        "AGENT->NEITHER": 5,
+        "AGENT->PERSON": 17,
+        "PERSON->PERSON": 98
+      }
+    },
+    "pd1000_eval": {
+      "ambiguous_or_insufficient": 0,
+      "boundary_errors": 16,
+      "by_current_label": {
+        "AGENT": {
+          "error_rate": {
+            "ci95": [
+              0.4474500917254436,
+              0.5892295691996852
+            ],
+            "interval_method": "Wilson score",
+            "n": 187,
+            "rate": 0.5187165775401069
+          },
+          "n": 187,
+          "transitions": {
+            "AGENT": 90,
+            "NEITHER": 50,
+            "PERSON": 47
+          }
+        },
+        "PERSON": {
+          "error_rate": {
+            "ci95": [
+              0.01057334494855243,
+              0.08702003515310984
+            ],
+            "interval_method": "Wilson score",
+            "n": 97,
+            "rate": 0.030927835051546393
+          },
+          "n": 97,
+          "transitions": {
+            "NEITHER": 3,
+            "PERSON": 94
+          }
+        }
+      },
+      "sample_records": 300,
+      "semantic_records": 284,
+      "transitions": {
+        "AGENT->AGENT": 90,
+        "AGENT->NEITHER": 50,
+        "AGENT->PERSON": 47,
+        "PERSON->NEITHER": 3,
+        "PERSON->PERSON": 94
+      }
+    }
+  },
+  "pd1000_random_agent_drift": {
+    "ci95": [
+      0.46275882627554077,
+      0.6574317252422498
+    ],
+    "interval_method": "Wilson score",
+    "n": 96,
+    "rate": 0.5625
+  },
+  "synthetic_weighted_drift": {
+    "affected_mention_estimate": 591788,
+    "ci95": [
+      0.36416421825423195,
+      0.436414033171531
+    ],
+    "method": "declared-subtype-weighted Jeffreys-binomial simulation",
+    "population_mentions": 1527557,
+    "rate": 0.38740845677117125
+  }
+}

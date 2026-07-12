@@ -1,0 +1,458 @@
+{
+  "pd1000_random_agent_calibration": {
+    "agent_to_neither": {
+      "ci95": [
+        0.09703709990686579,
+        0.24191486674528626
+      ],
+      "interval_method": "Wilson score",
+      "n": 96,
+      "rate": 0.15625
+    },
+    "agent_to_person": {
+      "ci95": [
+        0.31345302166501676,
+        0.5062611510582975
+      ],
+      "interval_method": "Wilson score",
+      "n": 96,
+      "rate": 0.40625
+    },
+    "any_semantic_drift": {
+      "ci95": [
+        0.46275882627554077,
+        0.6574317252422498
+      ],
+      "interval_method": "Wilson score",
+      "n": 96,
+      "rate": 0.5625
+    },
+    "decisions": {
+      "AGENT": 42,
+      "BAD_BOUNDARY": 4,
+      "NEITHER": 15,
+      "PERSON": 39
+    },
+    "overlap_agreement": {
+      "cohen_kappa": 0.8897058823529412,
+      "final_tie_breaks": 2,
+      "n": 30,
+      "raw_agreement": 0.9333333333333333
+    },
+    "population_gold_agent_mentions": 34783,
+    "sample_n": 100
+  },
+  "pd1000_risk_enriched_slice": {
+    "ambiguous_or_insufficient": 0,
+    "boundary_errors": 13,
+    "by_current_label": {
+      "AGENT": {
+        "error_rate": {
+          "ci95": [
+            0.36131907716512024,
+            0.4985698559660038
+          ],
+          "interval_method": "Wilson score",
+          "n": 196,
+          "rate": 0.42857142857142855
+        },
+        "n": 196,
+        "transitions": {
+          "AGENT": 112,
+          "NEITHER": 32,
+          "PERSON": 52
+        }
+      },
+      "PERSON": {
+        "error_rate": {
+          "ci95": [
+            0.03056628647161548,
+            0.13646466199411572
+          ],
+          "interval_method": "Wilson score",
+          "n": 91,
+          "rate": 0.06593406593406594
+        },
+        "n": 91,
+        "transitions": {
+          "NEITHER": 6,
+          "PERSON": 85
+        }
+      }
+    },
+    "sample_records": 300,
+    "semantic_records": 287,
+    "transitions": {
+      "AGENT->AGENT": 112,
+      "AGENT->NEITHER": 32,
+      "AGENT->PERSON": 52,
+      "PERSON->NEITHER": 6,
+      "PERSON->PERSON": 85
+    }
+  },
+  "synthetic_declared_subtypes": {
+    "ai": {
+      "agent_to_neither": {
+        "ci95": [
+          0.21880653237281705,
+          0.6134184992377469
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.4
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.2992980081982123,
+          0.7007019918017877
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.5
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.6989663547715128,
+          0.9721335187862319
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.9
+      },
+      "final_decisions": {
+        "AGENT": 1,
+        "AMBIGUOUS_CONTEXT": 1,
+        "NEITHER": 8,
+        "PERSON": 10
+      },
+      "population_declared_mentions": 132951,
+      "sample_n": 20
+    },
+    "artifact": {
+      "agent_to_neither": {
+        "ci95": [
+          0.6989663547715128,
+          0.9721335187862319
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.9
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.027866481213768224,
+          0.3010336452284873
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.1
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.8388748419471806,
+          1.0
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 1.0
+      },
+      "final_decisions": {
+        "NEITHER": 18,
+        "PERSON": 2
+      },
+      "population_declared_mentions": 232335,
+      "sample_n": 20
+    },
+    "beast": {
+      "agent_to_neither": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.6989663547715128,
+          0.9721335187862319
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.9
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.6989663547715128,
+          0.9721335187862319
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.9
+      },
+      "final_decisions": {
+        "AGENT": 2,
+        "PERSON": 18
+      },
+      "population_declared_mentions": 75395,
+      "sample_n": 20
+    },
+    "cult": {
+      "agent_to_neither": {
+        "ci95": [
+          0.008881448800795402,
+          0.23613119344674205
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.05
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.008881448800795402,
+          0.23613119344674205
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.05
+      },
+      "final_decisions": {
+        "AGENT": 18,
+        "AMBIGUOUS_CONTEXT": 1,
+        "NEITHER": 1
+      },
+      "population_declared_mentions": 98832,
+      "sample_n": 20
+    },
+    "deity": {
+      "agent_to_neither": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.531299122381256,
+          0.8881382985923343
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.75
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.531299122381256,
+          0.8881382985923343
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.75
+      },
+      "final_decisions": {
+        "AGENT": 4,
+        "AMBIGUOUS_CONTEXT": 1,
+        "PERSON": 15
+      },
+      "population_declared_mentions": 44883,
+      "sample_n": 20
+    },
+    "empire": {
+      "agent_to_neither": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.008881448800795402,
+          0.23613119344674205
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.05
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.008881448800795402,
+          0.23613119344674205
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.05
+      },
+      "final_decisions": {
+        "AGENT": 19,
+        "PERSON": 1
+      },
+      "population_declared_mentions": 59756,
+      "sample_n": 20
+    },
+    "faction": {
+      "agent_to_neither": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "final_decisions": {
+        "AGENT": 20
+      },
+      "population_declared_mentions": 666818,
+      "sample_n": 20
+    },
+    "guild": {
+      "agent_to_neither": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "final_decisions": {
+        "AGENT": 20
+      },
+      "population_declared_mentions": 84020,
+      "sample_n": 20
+    },
+    "ship": {
+      "agent_to_neither": {
+        "ci95": [
+          0.4810271816464765,
+          0.8545227551323956
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.7
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.0,
+          0.16112515805281938
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.0
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.4810271816464765,
+          0.8545227551323956
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.7
+      },
+      "final_decisions": {
+        "AGENT": 6,
+        "NEITHER": 14
+      },
+      "population_declared_mentions": 37686,
+      "sample_n": 20
+    },
+    "spirit": {
+      "agent_to_neither": {
+        "ci95": [
+          0.027866481213768224,
+          0.3010336452284873
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.1
+      },
+      "agent_to_person": {
+        "ci95": [
+          0.6395811352592431,
+          0.9476312541037835
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.85
+      },
+      "any_semantic_drift": {
+        "ci95": [
+          0.763868806553258,
+          0.9911185511992047
+        ],
+        "interval_method": "Wilson score",
+        "n": 20,
+        "rate": 0.95
+      },
+      "final_decisions": {
+        "AGENT": 1,
+        "NEITHER": 2,
+        "PERSON": 17
+      },
+      "population_declared_mentions": 94881,
+      "sample_n": 20
+    }
+  },
+  "synthetic_weighted_agent_drift": {
+    "affected_mention_estimate": 591788,
+    "ci95": [
+      0.36416421825423195,
+      0.436414033171531
+    ],
+    "method": "declared-subtype-weighted Jeffreys-binomial simulation",
+    "population_mentions": 1527557,
+    "rate": 0.38740845677117125
+  }
+}

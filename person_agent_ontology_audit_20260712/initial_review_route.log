@@ -1,0 +1,25 @@
+{
+  "expanded_context_records": 25,
+  "provisional_records": 551,
+  "review_count_distribution": {
+    "1": 450,
+    "2": 150
+  },
+  "route_counts": {
+    "nonoverlap_primary_accepted": 419,
+    "nonoverlap_to_expanded": 13,
+    "nonoverlap_to_second_review": 18,
+    "overlap_consensus_high_confidence": 128,
+    "overlap_consensus_low_confidence": 4,
+    "overlap_disagreement_to_tiebreak": 6,
+    "overlap_special_to_expanded": 12
+  },
+  "second_review_records": 18,
+  "tie_break_records": 6,
+  "unique_records": 600,
+  "validated_output_rows": {
+    "reviewer_a": 252,
+    "reviewer_b": 250,
+    "reviewer_c": 248
+  }
+}
